@@ -11,6 +11,8 @@ namespace :load do
     set :unicorn_log, -> { shared_path.join("log/unicorn.log") }
     set :unicorn_user, nil # user is set by executing `id -un` on the server
     set :unicorn_workers, 2
+
+    set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids')
   end
 end
 
