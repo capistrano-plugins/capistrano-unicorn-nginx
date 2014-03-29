@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
     Works *only* with Capistrano 3+. For Capistrano 2 try version 0.0.8 of this
     gem: http://rubygems.org/gems/capistrano-nginx-unicorn
   EOF
-  gem.summary       = "Create and manage unicorn + nginx configs from capistrano"
+  gem.summary       = "Capistrano tasks for automatic and sensible unicorn + nginx configuraion."
   gem.homepage      = "https://github.com/bruno-/capistrano-unicorn-nginx"
 
   gem.files         = `git ls-files`.split($/)
