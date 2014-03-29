@@ -41,8 +41,8 @@ namespace :nginx do
 
   desc 'Setup nginx ssl certs'
   task :setup_ssl do
+    next unless fetch(:nginx_use_ssl)
     on roles :web do
-      next unless fetch(:nginx_use_ssl)
       next if file_exists?("/etc/ssl/certs/#{fetch(:nginx_ssl_cert)}") && file_exists?("/etc/ssl/private/#{fetch(:nginx_ssl_cert_key)}")
 
       if fetch(:nginx_upload_local_cert)
