@@ -1,189 +1,196 @@
-# Capistrano-Nginx-Unicorn
+# Capistrano::UnicornNginx
 
-Capistrano tasks for configuration and management nginx+unicorn combo for zero downtime deployments of Rails applications.
+Capistrano tasks for automatic and sensible unicorn + nginx configuraion.
 
-Provides capistrano tasks to:
+Goals of this plugin:
 
-* easily add application to nginx and reload it's configuration
-* create unicorn init script for application, so it will be automatically started when OS restarts
-* start/stop unicorn (also can be done using `sudo service unicorn_<your_app> start/stop`)
-* reload unicorn using `USR2` signal to load new application version with zero downtime
-* creates logrotate record to rotate application logs
+* automatic unicorn and nginx configuration for Rails apps
+* **no manual ssh** to the server required
+* zero downtime deployments enabled
 
-Provides several capistrano variables for easy customization.
-Also, for full customization, all configs can be copied to the application using generators.
+Specifics:
 
-## Installation
+* generates nginx config file on the server
+* generates unicorn initializer and config files<br/>
+application is started automatically after server restart
+* capistrano tasks for server management, example: `unicorn:restart`<br/>
+see below for all available tasks
 
-Add this line to your application's Gemfile:
+`capistrano-unicorn-nginx` works only with Capistrano 3!
 
-    gem 'capistrano-nginx-unicorn', require: false, group: :development
+This project was based on
+[capistrano-nginx-unicorn](https://github.com/kalys/capistrano-nginx-unicorn).
+I contributed a lot to Capistrano 3 version of that plugin. In the end I
+decided to create my own project to bring in additional improvements, without
+having to ask for permissions and wait for merging.
 
-And then execute:
+### Installation
 
-    $ bundle
+Add this to `Gemfile`:
 
-Or install it yourself as:
+    group :development do
+      gem 'capistrano', '~> 3.1'
+      gem 'capistrano-unicorn-nginx'
+    end
 
-    $ gem install capistrano-nginx-unicorn
+And then:
 
-## Usage
+    $ bundle install
 
-Add this line to your `deploy.rb`
+### Setup and usage
 
-    require 'capistrano-nginx-unicorn'
+Add this line to `Capfile`
 
-Note, that following capistrano variables should be defined:
+    require 'capistrano/unicorn-nginx'
 
-    application
-    current_path
-    shared_path
-    user
+Set `nginx_server_name` in stage file, example `config/deploy/production.rb`:
 
-You can check that new tasks are available (`cap -T`):
+    set :user, 'deployer'   # user doing the deploy
+    set :nginx_server_name, 'mydomain.com'
 
-for nginx:
+or if you don't have a domain yet:
 
-    # add and enable application to nginx
-    cap nginx:setup
+    set :nginx_server_name, '<server_ip>'
 
-    # reload nginx configuration
-    cap nginx:reload
+And you're all set!
 
-and for unicorn:
+Execute:
 
-    # create unicorn configuration and init script
-    cap unicorn:setup
+    $ bundle exec cap deploy production
 
-    # start unicorn
-    cap unicorn:start
+and enjoy watching your app being deployed!
 
-    # stop unicorn
-    cap unicorn:stop
+### Configuration
 
-    # reload unicorn with no downtime
-    # old workers will process new request until new master is fully loaded
-    # then old workers will be automatically killed and new workers will start processing requests
-    cap unicorn:restart
+As described in the Usage section, this plugin works with minimal setup.
+However, configuration is possible.
 
-and shared:
+You'll find the options and their defaults below.
 
-    # create logrotate record to rotate application logs
-    cap logrotate
+In order to override the default, put the option in the stage file, for example:
 
-There is no need to execute any of these tasks manually.
-They will be called automatically on different deploy stages:
+    # in config/deploy/production.rb
+    set :unicorn_workers, 4
 
-* `nginx:setup`, `nginx:reload`, `unicorn:setup` and `logrotate` are hooked to `deploy:setup`
-* `unicorn:restart` is hooked to `deploy:restart`
+**Nginx options**
 
-This means that if you run `cap deploy:setup`,
-nginx and unicorn will be automatically configured.
-And after each deploy, unicorn will be automatically reloaded.
+Defaults are listed near option name in the first line.
 
-However, if you changed variables or customized templates,
-you can run any of these tasks to update configuration.
+- `set :nginx_server_name` # no default, required<br/>
+Your application's domain. You will be prompted if this option is not set.
+If you do not have a domain, you can put server IP - in this case you can
+deploy only one application on the server.
 
-## Customization
+- `set :nginx_pid, "/run/nginx.pid"`<br/>
+Path for nginx process pid file.
 
-### Using variables
+SSL related options:
 
-You can customize nginx and unicorn configs using capistrano variables:
+- `set :nginx_use_ssl, false`<br/>
+If set to `true`, nginx will be configured to 443 port and port 80 will be auto
+routed to 443. Also, on `nginx:setup`, paths to ssl certificate and key will be
+configured. Certificate file and key will be uploaded to `/etc/ssl/certs/`
+and `/etc/ssl/private/` directories on the server.
 
+- `set :nginx_upload_local_cert, true`<br/>
+If `true`, certificates will be uploaded from a local path. Otherwise, it
+is expected for the certificate and key defined in the next 2 variables to be
+already on the server.
 
-```ruby
-# path to customized templates (see below for details)
-# default value: "config/deploy/templates"
-set :templates_path, "config/deploy/templates"
+- `set :nginx_ssl_cert, "#{fetch(:nginx_server_name)}.crt"`<br/>
+Remote file name of the certificate. Only makes sense if `nginx_use_ssl` is set.
 
-# server name for nginx, default value: no (will be prompted if not set)
-# set this to your site name as it is visible from outside
-# this will allow 1 nginx to serve several sites with different `server_name`
-set :nginx_server_name, "example.com"
+- `set :nginx_ssl_cert_key, "#{fetch(:nginx_server_name)}.key"`<br/>
+Remote file name of the certificate. Only makes sense if `nginx_use_ssl` is set.
 
-# path, where unicorn pid file will be stored
-# default value: `"#{current_path}/tmp/pids/unicorn.pid"`
-set :unicorn_pid, "#{current_path}/tmp/pids/unicorn.pid"
+- `set :nginx_ssl_cert_local_path` # no default, required if
+`nginx_use_ssl = true` and `nginx_upload_local_cert = true`<br/>
+Local path to file with certificate. Only makes sense if `nginx_use_ssl` is
+set. This file will be copied to remote server. Example value:
+`set :nginx_ssl_cert_local_path, "/home/user/ssl/myssl.cert"`
 
-# path, where nginx pid file will be stored (used in logrotate recipe)
-# default value: `"/run/nginx.pid"`
-set :nginx_pid, "/run/nginx.pid"
+- `set :nginx_ssl_cert_key_local_path` # no default<br/>
+Local path to file with certificate key. Only makes sense if `nginx_use_ssl` is set.
+This file will be copied to remote server. Example value:
+`set :nginx_ssl_cert_key_local_path, "/home/user/ssl/myssl.key"`
 
-# path, where unicorn config file will be stored
-# default value: `"#{shared_path}/config/unicorn.rb"`
-set :unicorn_config, "#{shared_path}/config/unicorn.rb"
+**Unicorn options**
 
-# path, where unicorn log file will be stored
-# default value: `"#{shared_path}/config/unicorn.rb"`
-set :unicorn_log, "#{shared_path}/config/unicorn.rb"
+Defaults are listed near option name in the first line.
 
-# user name to run unicorn
-# default value: `user` (user varibale defined in your `deploy.rb`)
-set :unicorn_user, "user"
+- `set :unicorn_pid, shared_path.join("tmp/pids/unicorn.pid")`<br/>
+Path for unicorn process pid file.
 
-# number of unicorn workers
-# default value: no (will be prompted if not set)
-set :unicorn_workers, 4
+- `set :unicorn_config, shared_path.join("config/unicorn.rb")`<br/>
+Path for unicorn config file.
 
-# if set, nginx will be configured to 443 port and port 80 will be auto rewritten to 443
-# also, on `nginx:setup`, paths to ssl certificate and key will be configured
-# and certificate file and key will be copied to `/etc/ssl/certs` and `/etc/ssl/private/` directories
-# default value: false
-set :nginx_use_ssl, false
+- `set :unicorn_log, shared_path.join("log/unicorn.log")`<br/>
+Unicorn log path.
 
-# if set, it will ask to upload certificates from a local path. Otherwise, it will expect
-# the certificate and key defined in the next 2 variables to be already in the server.
-set :nginx_upload_local_certificate, { true }
+- `set :user` # no default, required<br/>
+User name to run unicorn. This should be the name of the user doing the deploy,
+example: `set :user, 'deploy'`
 
-# remote file name of the certificate, only makes sense if `nginx_use_ssl` is set
-# default value: `nginx_server_name + ".crt"`
-set :nginx_ssl_certificate, "#{nginx_server_name}.crt"
+- `set :unicorn_workers, 2`<br/>
+Number of unicorn workers.
 
-# remote file name of the certificate, only makes sense if `nginx_use_ssl` is set
-# default value: `nginx_server_name + ".key"`
-set :nginx_ssl_certificate_key, "#{nginx_server_name}.key"
+### How it works
 
-# local path to file with certificate, only makes sense if `nginx_use_ssl` is set
-# this file will be copied to remote server
-# default value: none (will be prompted if not set)
-set :nginx_ssl_certificate_local_path, "/home/ivalkeen/ssl/myssl.cert"
+`capistrano-unicorn-nginx` integrates seamlessly with the capistrano deploy task.
+Here's what happens when you run `bundle exec cap production deploy`:
 
-# local path to file with certificate key, only makes sense if `nginx_use_ssl` is set
-# this file will be copied to remote server
-# default value: none (will be prompted if not set)
-set :nginx_ssl_certificate_key_local_path, "/home/ivalkeen/ssl/myssl.key"
-```
+**Nginx**
 
-For example, of you site name is `example.com` and you want to use 8 unicorn workers,
-your `deploy.rb` will look like this:
+- `after :started, "nginx:setup"`<br/>
+Generates and uploads nginx config file. Symlinks config file to `/etc/nginx/sites-enabled`.
+- `after :started, "nginx:setup_ssl"`<br/>
+Performs SSL related tasks (false by default).
+- `after :publishing, "nginx:reload"`<br/>
+Reloads nginx.
 
-```ruby
-set :server_name, "example.com"
-set :unicorn_workers, 4
-require 'capistrano-nginx-unicorn'
-```
+**Unicorn**
 
-### Template Customization
+- `after :updated, "unicorn:setup_initializer"`<br/>
+Uploads unicorn initializer file.
+- `after :updated, "unicorn:setup_app_config"`<br/>
+Generates unicorn application config file
+- `after :publishing, "unicorn:restart"`<br/>
+Restarts unicorn after new release.
 
-If you want to change default templates, you can generate them using `rails generator`
+### Template customization
 
-    rails g capistrano:nginx_unicorn:config
+If you want to change default templates, you can generate them using
+`rails generator`:
 
-This will copy default templates to `config/deploy/templates` directory,
-so you can customize them as you like, and capistrano tasks will use this templates instead of default.
+    $ bundle exec rails g capistrano:unicorn_nginx:config
+
+This will copy default templates to `config/deploy/templates` directory, so you
+can customize them as you like, and capistrano tasks will use this templates
+instead of default.
 
 You can also provide path, where to generate templates:
 
-    rails g capistrano:nginx_unicorn:config config/templates
+    $ bundle exec rails g capistrano:unicorn_nginx:config config/templates
 
-# TODO:
+### More Capistrano automation?
 
-* add tests
+If you'd like to streamline your Capistrano deploys, you might want to check
+these zero-configuration, plug-n-play plugins:
 
-## Contributing
+- [capistrano-postgresql](https://github.com/bruno-/capistrano-postgresql)<br/>
+plugin that automates postgresql configuration and setup
+- [capistrano-rbenv-install](https://github.com/bruno-/capistrano-rbenv-install)<br/>
+would you like Capistrano to install rubies for you?
+- [capistrano-safe-deploy-to](https://github.com/bruno-/capistrano-safe-deploy-to)<br/>
+if you're annoyed that Capistrano does **not** create a deployment path for the
+app on the server (default `/var/www/myapp`), this is what you need!
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+### Bug reports and pull requests
+
+...are very welcome!
+
+### Thanks
+
+[@kalys](https://github.com/kalys) - for his
+[capistrano-nginx-unicorn](https://github.com/kalys/capistrano-nginx-unicorn)
+plugin.
