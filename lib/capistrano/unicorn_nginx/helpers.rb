@@ -22,6 +22,10 @@ module Capistrano
         test "[ -e #{path} ]"
       end
 
+      def deploy_user
+        capture :id, '-un'
+      end
+
     end
   end
 end

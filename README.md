@@ -121,9 +121,6 @@ Path for unicorn process pid file.
 - `set :unicorn_config, shared_path.join("config/unicorn.rb")`<br/>
 Path for unicorn config file.
 
-- `set :unicorn_log, shared_path.join("log/unicorn.log")`<br/>
-Unicorn log path.
-
 - `set :unicorn_workers, 2`<br/>
 Number of unicorn workers.
 

@@ -1,7 +1,7 @@
 working_directory "<%= current_path %>"
 pid "<%= fetch(:unicorn_pid) %>"
-stderr_path "<%= fetch(:unicorn_log) %>"
-stdout_path "<%= fetch(:unicorn_log) %>"
+stdout_path "<%= unicorn_log_file %>"
+stderr_path "<%= unicorn_error_log_file %>"
 
 listen "/tmp/unicorn.<%= fetch(:nginx_config_name) %>.sock"
 worker_processes <%= fetch(:unicorn_workers) %>
