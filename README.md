@@ -115,6 +115,9 @@ This file will be copied to remote server. Example value:
 
 Defaults are listed near option name in the first line.
 
+- `set :unicorn_service, "unicorn_#{fetch(:application)}_#{fetch(:stage)}`<br/>
+Unicorn service name is `unicorn_myapp_production` by default.
+
 - `set :unicorn_pid, shared_path.join("tmp/pids/unicorn.pid")`<br/>
 Path for unicorn process pid file.
 
