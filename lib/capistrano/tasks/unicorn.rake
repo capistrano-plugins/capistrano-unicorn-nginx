@@ -15,28 +15,30 @@ namespace :load do
 end
 
 namespace :unicorn do
-  desc "Setup Unicorn initializer"
+  desc 'Setup Unicorn initializer'
   task :setup_initializer do
     on roles :app do
       next if file_exists? "/etc/init.d/#{fetch(:unicorn_service_name)}"
 
       set :unicorn_user, capture(:id, '-un') unless fetch(:unicorn_user)
-      template "unicorn_init.erb", "#{fetch(:tmp_dir)}/unicorn_init"
-      execute :chmod, "+x", "#{fetch(:tmp_dir)}/unicorn_init"
-      sudo :mv, "#{fetch(:tmp_dir)}/unicorn_init", "/etc/init.d/#{fetch(:unicorn_service_name)}"
-      sudo "update-rc.d -f #{fetch(:unicorn_service_name)} defaults"
+      init_tmp = "#{fetch(:tmp_dir)}/unicorn_init"
+
+      template 'unicorn_init.erb', init_tmp
+      execute :chmod, "+x", init_tmp
+      sudo :mv, init_tmp, "/etc/init.d/#{fetch(:unicorn_service_name)}"
+      sudo 'update-rc.d', '-f', fetch(:unicorn_service_name), 'defaults'
     end
   end
 
-  desc "Setup Unicorn app configuration"
+  desc 'Setup Unicorn app configuration'
   task :setup_app_config do
     on roles :app do
       next if file_exists? fetch(:unicorn_config)
 
-      execute :mkdir, "-p", shared_path.join("config")
-      execute :mkdir, "-p", shared_path.join("log")
-      execute :mkdir, "-p", shared_path.join("tmp/pids")
-      template "unicorn.rb.erb", fetch(:unicorn_config)
+      execute :mkdir, '-p', shared_path.join('config')
+      execute :mkdir, '-p', shared_path.join('log')
+      execute :mkdir, '-p', shared_path.join('tmp/pids')
+      template 'unicorn.rb.erb', fetch(:unicorn_config)
     end
   end
 
@@ -51,7 +53,7 @@ namespace :unicorn do
 end
 
 namespace :deploy do
-  after :updated, "unicorn:setup_initializer"
-  after :updated, "unicorn:setup_app_config"
-  after :publishing, "unicorn:restart"
+  after :updated, 'unicorn:setup_initializer'
+  after :updated, 'unicorn:setup_app_config'
+  after :publishing, 'unicorn:restart'
 end
