@@ -43,13 +43,13 @@ Add this line to `Capfile`
 
     require 'capistrano/unicorn-nginx'
 
-Set `nginx_server_name` in stage file, example `config/deploy/production.rb`:
+If you already have a domain for your app, set `nginx_server_name` in stage
+file, example `config/deploy/production.rb`:
 
     set :nginx_server_name, 'mydomain.com'
 
-or if you don't have a domain yet:
-
-    set :nginx_server_name, '<server_ip>'
+If you don't have a domain yet, you do not have to do anything
+(`nginx_server_name` will use the default value - server IP).
 
 And you're all set!
 
@@ -75,10 +75,8 @@ In order to override the default, put the option in the stage file, for example:
 
 Defaults are listed near option name in the first line.
 
-- `set :nginx_server_name` # no default, required<br/>
-Your application's domain. You will be prompted if this option is not set.
-If you do not have a domain, you can put server IP - in this case you can
-deploy only one application on the server.
+- `set :nginx_server_name` # defaults to <server_IP><br/>
+Your application's domain. The default is your server's IP address.
 
 - `set :nginx_pid, "/run/nginx.pid"`<br/>
 Path for nginx process pid file.

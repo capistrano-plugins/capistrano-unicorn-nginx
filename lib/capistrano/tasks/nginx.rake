@@ -5,7 +5,7 @@ include Capistrano::UnicornNginx::Helpers
 namespace :load do
   task :defaults do
     set :templates_path, 'config/deploy/templates'
-    set :nginx_server_name, -> { ask(:nginx_server_name, 'Nginx server name: ') }
+    set :nginx_server_name, -> { host.to_s }
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, '/run/nginx.pid'
     # ssl options
