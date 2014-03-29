@@ -1,20 +1,24 @@
+require 'capistrano/dsl/nginx_paths'
 require 'capistrano/unicorn_nginx/helpers'
 
 include Capistrano::UnicornNginx::Helpers
+include Capistrano::DSL::NginxPaths
 
 namespace :load do
   task :defaults do
     set :templates_path, 'config/deploy/templates'
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
-    set :nginx_pid, '/run/nginx.pid'
+    set :nginx_pid, nginx_default_pid_file
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
     set :nginx_use_ssl, false
-    set :nginx_ssl_cert, -> { "#{fetch(:nginx_server_name)}.crt" }
-    set :nginx_ssl_cert_key, -> { "#{fetch(:nginx_server_name)}.key" }
+    set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
+    set :nginx_ssl_cert_key, -> { nginx_default_ssl_cert_key_file_name }
     set :nginx_upload_local_cert, true
     set :nginx_ssl_cert_local_path, -> { ask(:nginx_ssl_cert_local_path, 'Local path to ssl certificate: ') }
     set :nginx_ssl_cert_key_local_path, -> { ask(:nginx_ssl_cert_key_local_path, 'Local path to ssl certificate key: ') }
+
+    set :linked_dirs, fetch(:linked_dirs, []).push('log')
   end
 end
 
@@ -29,13 +33,10 @@ namespace :nginx do
   desc 'Setup nginx configuration'
   task :setup do
     on roles :web do
-      config_name = fetch(:nginx_config_name)
-      next if file_exists? "/etc/nginx/sites-available/#{config_name}"
-
-      execute :mkdir, '-p', shared_path.join('log')
-      template 'nginx_conf.erb', "#{fetch(:tmp_dir)}/#{config_name}"
-      sudo :mv, "#{fetch(:tmp_dir)}/#{config_name}", "/etc/nginx/sites-available/#{config_name}"
-      sudo :ln, '-fs', "/etc/nginx/sites-available/#{config_name}", "/etc/nginx/sites-enabled/#{config_name}"
+      next if file_exists? nginx_sites_available_file
+      template 'nginx_conf.erb', nginx_config_tmp_file
+      sudo :mv, nginx_config_tmp_file, nginx_sites_available_file
+      sudo :ln, '-fs', nginx_sites_available_file, nginx_sites_enabled_file
     end
   end
 
@@ -43,28 +44,26 @@ namespace :nginx do
   task :setup_ssl do
     next unless fetch(:nginx_use_ssl)
     on roles :web do
-      next if file_exists?("/etc/ssl/certs/#{fetch(:nginx_ssl_cert)}") && file_exists?("/etc/ssl/private/#{fetch(:nginx_ssl_cert_key)}")
-
+      next if file_exists?(nginx_ssl_cert_file) && file_exists?(nginx_ssl_cert_key_file)
       if fetch(:nginx_upload_local_cert)
-        upload! fetch(:nginx_ssl_cert_local_path), "#{fetch(:tmp_dir)}/#{fetch(:nginx_ssl_cert)}"
-        upload! fetch(:nginx_ssl_cert_key_local_path), "#{fetch(:tmp_dir)}/#{fetch(:nginx_ssl_cert_key)}"
-        sudo :mv, "#{fetch(:tmp_dir)}/#{fetch(:nginx_ssl_cert)}", "/etc/ssl/certs/#{fetch(:nginx_ssl_cert)}"
-        sudo :mv, "#{fetch(:tmp_dir)}/#{fetch(:nginx_ssl_cert_key)}", "/etc/ssl/private/#{fetch(:nginx_ssl_cert_key)}"
+        upload! fetch(:nginx_ssl_cert_local_path), nginx_ssl_cert_file
+        upload! fetch(:nginx_ssl_cert_key_local_path), nginx_ssl_cert_key_file
       end
-      sudo :chown, 'root:root', "/etc/ssl/certs/#{fetch(:nginx_ssl_cert)}"
-      sudo :chown, 'root:root', "/etc/ssl/private/#{fetch(:nginx_ssl_cert_key)}"
+      sudo :chown, 'root:root', nginx_ssl_cert_file
+      sudo :chown, 'root:root', nginx_ssl_cert_key_file
     end
   end
 
   desc 'Reload nginx configuration'
   task :reload do
     on roles :web do
-      sudo '/etc/init.d/nginx reload'
+      sudo nginx_service_path, 'reload'
     end
   end
 
   before :setup, :defaults
   before :setup_ssl, :defaults
+
 end
 
 namespace :deploy do

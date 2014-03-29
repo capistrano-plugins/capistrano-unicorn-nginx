@@ -13,8 +13,8 @@ server {
 <% if fetch(:nginx_use_ssl) %>
   listen 443;
   ssl on;
-  ssl_certificate /etc/ssl/certs/<%= fetch(:nginx_ssl_certificate) %>;
-  ssl_certificate_key /etc/ssl/private/<%= fetch(:nginx_ssl_certificate_key) %>;
+  ssl_certificate <%= nginx_ssl_cert_file %>;
+  ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
 <% else %>
   listen 80;
 <% end %>
@@ -38,8 +38,8 @@ server {
 <% end %>
     proxy_pass http://unicorn_<%= fetch(:nginx_config_name) %>;
     # limit_req zone=one;
-    access_log <%= shared_path %>/log/nginx.access.log;
-    error_log <%= shared_path %>/log/nginx.error.log;
+    access_log <%= nginx_access_log_file %>;
+    error_log <%= nginx_error_log_file %>;
   }
 
   location ^~ /assets/ {
