@@ -9,7 +9,7 @@ namespace :load do
     set :unicorn_pid, -> { shared_path.join("tmp/pids/unicorn.pid") }
     set :unicorn_config, -> { shared_path.join("config/unicorn.rb") }
     set :unicorn_log, -> { shared_path.join("log/unicorn.log") }
-    set :unicorn_user, -> { fetch(:user) }
+    set :unicorn_user, nil # user is set by executing `id -un` on the server
     set :unicorn_workers, 2
   end
 end
@@ -20,6 +20,7 @@ namespace :unicorn do
     on roles :app do
       next if file_exists? "/etc/init.d/#{fetch(:unicorn_service_name)}"
 
+      set :unicorn_user, capture(:id, '-un') unless fetch(:unicorn_user)
       template "unicorn_init.erb", "#{fetch(:tmp_dir)}/unicorn_init"
       execute :chmod, "+x", "#{fetch(:tmp_dir)}/unicorn_init"
       sudo :mv, "#{fetch(:tmp_dir)}/unicorn_init", "/etc/init.d/#{fetch(:unicorn_service_name)}"

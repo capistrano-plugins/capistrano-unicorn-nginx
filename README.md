@@ -45,7 +45,6 @@ Add this line to `Capfile`
 
 Set `nginx_server_name` in stage file, example `config/deploy/production.rb`:
 
-    set :user, 'deployer'   # user doing the deploy
     set :nginx_server_name, 'mydomain.com'
 
 or if you don't have a domain yet:
@@ -126,10 +125,6 @@ Path for unicorn config file.
 
 - `set :unicorn_log, shared_path.join("log/unicorn.log")`<br/>
 Unicorn log path.
-
-- `set :user` # no default, required<br/>
-User name to run unicorn. This should be the name of the user doing the deploy,
-example: `set :user, 'deploy'`
 
 - `set :unicorn_workers, 2`<br/>
 Number of unicorn workers.
