@@ -5,9 +5,9 @@ include Capistrano::UnicornNginx::Helpers
 namespace :load do
   task :defaults do
     set :templates_path, 'config/deploy/templates'
-    set :nginx_server_name, -> { host.to_s }
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, '/run/nginx.pid'
+    # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
     set :nginx_use_ssl, false
     set :nginx_ssl_cert, -> { "#{fetch(:nginx_server_name)}.crt" }
@@ -19,6 +19,13 @@ namespace :load do
 end
 
 namespace :nginx do
+
+  task :defaults do
+    on roles :web do
+      set :nginx_server_name, fetch(:nginx_server_name, host.to_s)
+    end
+  end
+
   desc 'Setup nginx configuration'
   task :setup do
     on roles :web do
@@ -55,6 +62,9 @@ namespace :nginx do
       sudo '/etc/init.d/nginx reload'
     end
   end
+
+  before :setup, :defaults
+  before :setup_ssl, :defaults
 end
 
 namespace :deploy do
