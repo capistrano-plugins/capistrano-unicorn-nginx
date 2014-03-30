@@ -43,13 +43,23 @@ Add this line to `Capfile`
 
     require 'capistrano/unicorn-nginx'
 
-If you already have a domain for your app, set `nginx_server_name` in stage
-file, example `config/deploy/production.rb`:
+Only if you already have a domain for your app, set `nginx_server_name` in
+stage file, example `config/deploy/production.rb`:
 
     set :nginx_server_name, 'mydomain.com'
 
 If you don't have a domain yet, you do not have to do anything
 (`nginx_server_name` will use the default value - server IP).
+
+**SSL only setup**
+
+If you want to setup SSL for your page, add these options to stage file
+(i.e. `config/deploy/production.rb`):
+
+    # ignore this if you do not need SSL
+    set :nginx_use_ssl, true
+    set :nginx_ssl_cert_local_path, "/path/to/ssl_cert.crt"
+    set :nginx_ssl_cert_key_local_path, "/path/to/ssl_cert.key"
 
 And you're all set!
 
