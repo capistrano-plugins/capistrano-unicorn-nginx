@@ -2,10 +2,6 @@ module Capistrano
   module DSL
     module NginxPaths
 
-      def nginx_config_tmp_file
-        "#{fetch(:tmp_dir)}/#{fetch(:nginx_config_name)}"
-      end
-
       def nginx_sites_available_file
         "/etc/nginx/sites-available/#{fetch(:nginx_config_name)}"
       end

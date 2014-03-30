@@ -2,10 +2,6 @@ module Capistrano
   module DSL
     module UnicornPaths
 
-      def unicorn_initd_tmp_file
-        "#{fetch(:tmp_dir)}/#{fetch(:unicorn_service)}"
-      end
-
       def unicorn_initd_file
         "/etc/init.d/#{fetch(:unicorn_service)}"
       end

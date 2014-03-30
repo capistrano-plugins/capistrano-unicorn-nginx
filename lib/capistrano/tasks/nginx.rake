@@ -34,8 +34,7 @@ namespace :nginx do
   task :setup do
     on roles :web do
       next if file_exists? nginx_sites_available_file
-      template 'nginx_conf.erb', nginx_config_tmp_file
-      sudo :mv, nginx_config_tmp_file, nginx_sites_available_file
+      sudo_upload! template('nginx_conf.erb'), nginx_sites_available_file
       sudo :ln, '-fs', nginx_sites_available_file, nginx_sites_enabled_file
     end
   end
