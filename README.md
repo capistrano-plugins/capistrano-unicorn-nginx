@@ -41,7 +41,7 @@ And then:
 
 Add this line to `Capfile`
 
-    require 'capistrano/unicorn-nginx'
+    require 'capistrano/unicorn_nginx'
 
 Only if you already have a domain for your app, set `nginx_server_name` in
 stage file, example `config/deploy/production.rb`:
