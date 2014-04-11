@@ -30,7 +30,7 @@ Add this to `Gemfile`:
 
     group :development do
       gem 'capistrano', '~> 3.1'
-      gem 'capistrano-unicorn-nginx'
+      gem 'capistrano-unicorn-nginx', '~> 2.0'
     end
 
 And then:
