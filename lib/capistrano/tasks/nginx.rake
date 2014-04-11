@@ -66,7 +66,11 @@ namespace :nginx do
 end
 
 namespace :deploy do
-  after :started, 'nginx:setup'
-  after :started, 'nginx:setup_ssl'
   after :publishing, 'nginx:reload'
+end
+
+desc 'Server setup tasks'
+task :setup do
+  invoke 'nginx:setup'
+  invoke 'nginx:setup_ssl'
 end

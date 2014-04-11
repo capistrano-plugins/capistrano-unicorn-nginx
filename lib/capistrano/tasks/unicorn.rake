@@ -39,6 +39,7 @@ namespace :unicorn do
   task :setup_app_config do
     on roles :app do
       next if file_exists? fetch(:unicorn_config)
+      execute :mkdir, '-pv', File.dirname(fetch(:unicorn_config))
       upload! template('unicorn.rb.erb'), fetch(:unicorn_config)
     end
   end
@@ -57,7 +58,11 @@ namespace :unicorn do
 end
 
 namespace :deploy do
-  after :updated, 'unicorn:setup_initializer'
-  after :updated, 'unicorn:setup_app_config'
   after :publishing, 'unicorn:restart'
+end
+
+desc 'Server setup tasks'
+task :setup do
+  invoke 'unicorn:setup_initializer'
+  invoke 'unicorn:setup_app_config'
 end
