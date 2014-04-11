@@ -63,11 +63,17 @@ If you want to setup SSL for your page, add these options to stage file
 
 And you're all set!
 
-Execute:
+**Setup task**
 
-    $ bundle exec cap deploy production
+Make sure the `deploy_to` path exists and has the right privileges on the
+server (i.e. `/var/www/myapp`).<br/>
+Or just install
+[capistrano-safe-deploy-to](https://github.com/bruno-/capistrano-safe-deploy-to)
+plugin and don't think about it.
 
-and enjoy watching your app being deployed!
+To setup the server for unicorn and nginx, run:
+
+    $ bundle exec cap production setup
 
 ### Configuration
 
@@ -139,24 +145,30 @@ Number of unicorn workers.
 
 ### How it works
 
-`capistrano-unicorn-nginx` integrates seamlessly with the capistrano deploy task.
-Here's what happens when you run `bundle exec cap production deploy`:
+Here's what happens when you run `$ bundle exec cap production setup`:
 
 **Nginx**
 
-- `after :started, "nginx:setup"`<br/>
-Generates and uploads nginx config file. Symlinks config file to `/etc/nginx/sites-enabled`.
-- `after :started, "nginx:setup_ssl"`<br/>
-Performs SSL related tasks (false by default).
-- `after :publishing, "nginx:reload"`<br/>
-Reloads nginx.
+- `nginx:setup`<br/>
+Generates and uploads nginx config file. Symlinks config file to
+`/etc/nginx/sites-enabled`.
+- `nginx:setup_ssl`<br/>
+Performs SSL related tasks if `nginx_use_ssl` is true (false by default).
 
 **Unicorn**
 
-- `after :updated, "unicorn:setup_initializer"`<br/>
+- `unicorn:setup_initializer`<br/>
 Uploads unicorn initializer file.
-- `after :updated, "unicorn:setup_app_config"`<br/>
+- `unicorn:setup_app_config`<br/>
 Generates unicorn application config file
+
+**Capistrano `deploy` task**
+
+This plugin also integrates seamlessly with Capistrano `deploy` task.
+Here's what happens when you run `$ bundle exec cap production deploy`:
+
+- `after :publishing, "nginx:reload"`<br/>
+Reloads nginx.
 - `after :publishing, "unicorn:restart"`<br/>
 Restarts unicorn after new release.
 
