@@ -97,6 +97,9 @@ Your application's domain. The default is your server's IP address.
 - `set :nginx_pid, "/run/nginx.pid"`<br/>
 Path for nginx process pid file.
 
+- `set :nginx_location, "/etc/nginx"`<br/>
+Nginx installation directory.
+
 SSL related options:
 
 - `set :nginx_use_ssl, false`<br/>
