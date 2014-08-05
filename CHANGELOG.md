@@ -1,9 +1,10 @@
 # Changelog
 
 ### master
+
+### v2.1.0, 2014-08-05
 - add `nginx_location` option that specifies nginx installation dir
   (@jordanyaker)
-
 ### v2.0.0, 2014-04-11
 - all the work is moved to the `setup` task
 ### v1.0.2, 2014-03-30
