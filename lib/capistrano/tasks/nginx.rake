@@ -11,6 +11,7 @@ namespace :load do
     set :nginx_pid, nginx_default_pid_file
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
+    set :nginx_location, '/etc/nginx'
     set :nginx_use_ssl, false
     set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
     set :nginx_ssl_cert_key, -> { nginx_default_ssl_cert_key_file_name }
