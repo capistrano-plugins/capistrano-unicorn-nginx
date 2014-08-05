@@ -3,11 +3,11 @@ module Capistrano
     module NginxPaths
 
       def nginx_sites_available_file
-        "/etc/nginx/sites-available/#{fetch(:nginx_config_name)}"
+        "#{fetch(:nginx_location)}/sites-available/#{fetch(:nginx_config_name)}"
       end
 
       def nginx_sites_enabled_file
-        "/etc/nginx/sites-enabled/#{fetch(:nginx_config_name)}"
+        "#{fetch(:nginx_location)}/sites-enabled/#{fetch(:nginx_config_name)}"
       end
 
       def nginx_service_path
