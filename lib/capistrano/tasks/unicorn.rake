@@ -14,6 +14,12 @@ namespace :load do
     # set :unicorn_user # default set in `unicorn:defaults` task
 
     set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids')
+
+    set :unicorn_overwrite_config, false # set to true if you want to overwrite unicorn config files on next `cap setup`
+
+    set :unicorn_use_tcp, -> { roles(:app).count > 1}  # use tcp if there are multiple app nodes
+    set :unicorn_tcp_listen_port, 8080
+
   end
 end
 
@@ -28,7 +34,7 @@ namespace :unicorn do
   desc 'Setup Unicorn initializer'
   task :setup_initializer do
     on roles :app do
-      next if file_exists? unicorn_initd_file
+      next if !fetch(:unicorn_overwrite_config) && file_exists?(unicorn_initd_file)
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
       sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
@@ -38,7 +44,7 @@ namespace :unicorn do
   desc 'Setup Unicorn app configuration'
   task :setup_app_config do
     on roles :app do
-      next if file_exists? fetch(:unicorn_config)
+      next if !fetch(:unicorn_overwrite_config) && file_exists?(fetch(:unicorn_config))
       execute :mkdir, '-pv', File.dirname(fetch(:unicorn_config))
       upload! template('unicorn.rb.erb'), fetch(:unicorn_config)
     end
