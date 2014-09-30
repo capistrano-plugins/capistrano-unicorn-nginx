@@ -23,6 +23,8 @@ namespace :load do
     set :nginx_overwrite_config, false # set to true if you want to overwrite nginx config files on next `cap setup`
 
     set :linked_dirs, fetch(:linked_dirs, []).push('log')
+
+    set :unicorn_tcp_listen_port, 8080
   end
 end
 
