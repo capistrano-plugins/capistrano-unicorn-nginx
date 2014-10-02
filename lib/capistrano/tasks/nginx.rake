@@ -31,8 +31,26 @@ namespace :nginx do
     end
   end
 
+  # this is needed when the web role is a non release role -> deploy directories are not created, and nginx log files
+  # are written to "#{deploy_path}/shared/log/"
+  desc "Create the nginx log directory"
+  task :create_log_dir do
+    on roles :web do
+      # create the deploy_to, shared_path and the directory in which the nginx_access_log_file resides.
+      # We need to be conservative and ensure that all are created with the correct ownership: it could happen that
+      # web does become a release role later, in which case the ownerships need to be correct.
+      [deploy_path, shared_path, File.dirname(nginx_access_log_file)].each do |dir|
+        next if file_exists? dir
+        sudo :mkdir, '-pv', dir
+        user = capture :id, '-un'
+        group = capture :id, '-gn'
+        sudo :chown, "#{user}:#{group}", dir
+      end
+    end
+  end
+
   desc 'Setup nginx configuration'
-  task :setup do
+  task setup: [:create_log_dir] do
     on roles :web do
       sudo_upload! template('nginx_conf.erb'), nginx_sites_available_file
       sudo :ln, '-fs', nginx_sites_available_file, nginx_sites_enabled_file
