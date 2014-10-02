@@ -28,7 +28,6 @@ namespace :unicorn do
   desc 'Setup Unicorn initializer'
   task :setup_initializer do
     on roles :app do
-      next if file_exists? unicorn_initd_file
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
       sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
@@ -38,7 +37,6 @@ namespace :unicorn do
   desc 'Setup Unicorn app configuration'
   task :setup_app_config do
     on roles :app do
-      next if file_exists? fetch(:unicorn_config)
       execute :mkdir, '-pv', File.dirname(fetch(:unicorn_config))
       upload! template('unicorn.rb.erb'), fetch(:unicorn_config)
     end
