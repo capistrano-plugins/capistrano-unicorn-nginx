@@ -146,6 +146,10 @@ Path for unicorn config file.
 - `set :unicorn_workers, 2`<br/>
 Number of unicorn workers.
 
+- `set :unicorn_app_env`<br/>
+Set to the value of `rails_env` (for compatibility with
+[capistrano-rails gem](https://github.com/capistrano/rails) or `stage` option.
+
 ### How it works
 
 Here's what happens when you run `$ bundle exec cap production setup`:
