@@ -15,9 +15,9 @@ TIMEOUT=${TIMEOUT-60}
 APP_ROOT=<%= current_path %>
 PID=<%= fetch(:unicorn_pid) %>
 
-CMD="cd $APP_ROOT && <%= bundle_unicorn("-D -c", fetch(:unicorn_config), "-E", fetch(:stage)) %>"
-
 AS_USER=<%= fetch(:unicorn_user) %>
+CMD="export HOME; true "${HOME:=$(getent passwd "$AS_USER" | cut -d: -f6;)}" ; cd $APP_ROOT && <%= bundle_unicorn("-D -c", fetch(:unicorn_config), "-E", fetch(:stage)) %>"
+
 set -u
 
 OLD_PIN="$PID.oldbin"
@@ -34,7 +34,7 @@ run () {
   if [ "$(id -un)" = "$AS_USER" ]; then
     eval $1
   else
-    su -c "export HOME; true "${HOME:=$(cd . ; pwd;)}" ; $1" - $AS_USER
+    su -c "$1" - $AS_USER
   fi
 }
 
