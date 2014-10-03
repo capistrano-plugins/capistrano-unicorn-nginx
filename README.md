@@ -192,16 +192,7 @@ You can also provide path, where to generate templates:
 
 ### More Capistrano automation?
 
-If you'd like to streamline your Capistrano deploys, you might want to check
-these zero-configuration, plug-n-play plugins:
-
-- [capistrano-postgresql](https://github.com/bruno-/capistrano-postgresql)<br/>
-plugin that automates postgresql configuration and setup
-- [capistrano-rbenv-install](https://github.com/bruno-/capistrano-rbenv-install)<br/>
-would you like Capistrano to install rubies for you?
-- [capistrano-safe-deploy-to](https://github.com/bruno-/capistrano-safe-deploy-to)<br/>
-if you're annoyed that Capistrano does **not** create a deployment path for the
-app on the server (default `/var/www/myapp`), this is what you need!
+Check out [capistrano-plugins](https://github.com/capistrano-plugins) github org.
 
 ### Bug reports and pull requests
 
