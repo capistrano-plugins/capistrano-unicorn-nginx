@@ -3,6 +3,8 @@
 ### master
 - enable setting unicorn app environment with `rails_env` option.
   If `rails_env` is not set, `stage` option is used as until now. (@bruno-)
+- add load balancing support (@rhomeister)
+- config files are updated each time `setup` task is run (@rhomeister)
 
 ### v2.1.0, 2014-08-05
 - add `nginx_location` option that specifies nginx installation dir
