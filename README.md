@@ -43,6 +43,11 @@ Depending on your needs 2 general scenarios are covered:
 - [multiple server setup](https://github.com/capistrano-plugins/capistrano-unicorn-nginx/wiki/Multiple-server-setup)<br/>
   Webserver (nginx) and application server (unicorn) run on different nodes.
 
+### Default log file directories
+
+- nginx: `/var/log/nginx/`
+- unicorn: `#{shared_path}/log/`
+
 ### Configuration
 
 See the
