@@ -1,6 +1,8 @@
 # Changelog
 
 ### master
+
+### v3.0.0, 2014-10-05
 - enable setting unicorn app environment with `rails_env` option.
   If `rails_env` is not set, `stage` option is used as until now. (@bruno-)
 - add load balancing support (@rhomeister)
