@@ -1,6 +1,8 @@
 # Changelog
 
 ### master
+- setup nginx and unicorn to use TCP if web and app roles are using different
+  servers
 
 ### v3.0.0, 2014-10-05
 - enable setting unicorn app environment with `rails_env` option.
