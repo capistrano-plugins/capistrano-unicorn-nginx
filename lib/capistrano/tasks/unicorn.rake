@@ -12,7 +12,7 @@ namespace :load do
     set :unicorn_config, -> { unicorn_default_config_file }
     set :unicorn_workers, 2
     set :unicorn_tcp_listen_port, 8080
-    set :unicorn_use_tcp, -> { roles(:app).count > 1}  # use tcp if there are multiple app nodes
+    set :unicorn_use_tcp, -> { roles(:app, :web).count > 1 } # use tcp if web and app nodes are on different servers
     set :unicorn_app_env, -> { fetch(:rails_env) || fetch(:stage) }
     # set :unicorn_user # default set in `unicorn:defaults` task
 
