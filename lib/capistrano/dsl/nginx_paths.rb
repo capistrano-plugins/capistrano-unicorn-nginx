@@ -37,11 +37,11 @@ module Capistrano
 
       # log files
       def nginx_access_log_file
-        shared_path.join('log/nginx.access.log')
+        "/var/log/nginx/#{fetch(:nginx_config_name)}.access.log"
       end
 
       def nginx_error_log_file
-        shared_path.join('log/nginx.error.log')
+        "/var/log/nginx/#{fetch(:nginx_config_name)}.error.log"
       end
 
     end
