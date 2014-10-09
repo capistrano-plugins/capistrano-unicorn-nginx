@@ -2,6 +2,9 @@
 
 ### master
 
+### v3.1.1, 2014-10-09
+- add `server_name` directive for the port 80 ssl block in nginx_conf
+
 ### v3.1.0, 2014-10-07
 - setup nginx and unicorn to use TCP if web and app roles are using different
   servers
