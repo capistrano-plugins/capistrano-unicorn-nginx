@@ -11,6 +11,7 @@ upstream unicorn_<%= fetch(:nginx_config_name) %> {
 <% if fetch(:nginx_use_ssl) %>
 server {
   listen 80;
+  server_name <%= fetch(:nginx_server_name) %>;
   rewrite ^(.*) https://$host$1 permanent;
 }
 <% end %>
