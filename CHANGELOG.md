@@ -1,6 +1,7 @@
 # Changelog
 
 ### master
+- removed HTML 405 method from `nginx.conf`
 
 ### v3.1.1, 2014-10-09
 - add `server_name` directive for the port 80 ssl block in nginx_conf
