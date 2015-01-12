@@ -22,6 +22,8 @@ namespace :load do
     set :unicorn_logrotate_enabled, false # by default, don't use logrotate to rotate unicorn logs
 
     set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids')
+    set :detect_os_script_name, 'detect_os.sh'
+    set :detect_os_remote_script_path, "#{fetch(:tmp_dir)}/#{fetch(:application)}/detect_os.sh"
   end
 end
 
@@ -38,7 +40,12 @@ namespace :unicorn do
     on roles :app do
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
-      sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      case capture(fetch(:detect_os_remote_script_path)).downcase
+        when 'centos'
+          sudo 'chkconfig', fetch(:unicorn_service), 'on'
+        when 'ubuntu'
+          sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      end
     end
   end
 
@@ -71,11 +78,9 @@ namespace :unicorn do
   desc 'Upload OS detection script.'
   task :upload_os_detection_script do
     on roles :app do
-      script_name = 'detect_os.sh'
-      remote_script_path = "#{fetch(:tmp_dir)}/#{fetch(:application)}/#{script_name}"
       execute :mkdir, '-p', "#{fetch(:tmp_dir)}/#{fetch(:application)}/"
-      upload! File.join(File.dirname(__FILE__), "../../scripts/#{script_name}"), remote_script_path
-      execute :chmod, '+x', remote_script_path
+      upload! File.join(File.dirname(__FILE__), "../../scripts/#{fetch(:detect_os_script_name)}"), fetch(:detect_os_remote_script_path)
+      execute :chmod, '+x', fetch(:detect_os_remote_script_path)
     end
   end
 
