@@ -34,7 +34,7 @@ namespace :unicorn do
   end
 
   desc 'Setup Unicorn initializer'
-  task :setup_initializer do
+  task :setup_initializer => :upload_os_detection_script do
     on roles :app do
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
@@ -65,6 +65,17 @@ namespace :unicorn do
       on roles :app do
         sudo 'service', fetch(:unicorn_service), command
       end
+    end
+  end
+
+  desc 'Upload OS detection script.'
+  task :upload_os_detection_script do
+    on roles :app do
+      script_name = 'detect_os.sh'
+      remote_script_path = "#{fetch(:tmp_dir)}/#{fetch(:application)}/#{script_name}"
+      execute :mkdir, '-p', "#{fetch(:tmp_dir)}/#{fetch(:application)}/"
+      upload! File.join(File.dirname(__FILE__), "../../scripts/#{script_name}"), remote_script_path
+      execute :chmod, '+x', remote_script_path
     end
   end
 
