@@ -18,7 +18,11 @@ server {
 
 server {
 <% if fetch(:nginx_use_ssl) %>
+  <% if fetch(:nginx_use_spdy) %>
+  listen 443 spdy;
+  <% else %>
   listen 443;
+  <% end %>
   ssl on;
   ssl_certificate <%= nginx_ssl_cert_file %>;
   ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
