@@ -2,6 +2,7 @@
 
 ### master
 - allow 'PATCH' HTTP method in nginx_conf (@lonre)
+- added SPDY support (@rhomeister)
 
 ### v3.1.2, 2014-12-14
 - removed HTML 405 method from `nginx.conf`
