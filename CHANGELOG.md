@@ -1,6 +1,8 @@
 # Changelog
 
 ### master
+
+### v3.2.0, 2015-01-28
 - allow 'PATCH' HTTP method in nginx_conf (@lonre)
 - added SPDY support (@rhomeister)
 
