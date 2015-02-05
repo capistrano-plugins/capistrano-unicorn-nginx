@@ -6,8 +6,8 @@ require 'capistrano/unicorn_nginx/version'
 Gem::Specification.new do |gem|
   gem.name          = "capistrano-unicorn-nginx"
   gem.version       = Capistrano::UnicornNginx::VERSION
-  gem.authors       = ["Bruno Sutic"]
-  gem.email         = ["bruno.sutic@gmail.com"]
+  gem.authors       = ["Ruben Stranders", "Bruno Sutic"]
+  gem.email         = ["r.stranders@gmail.com", "bruno.sutic@gmail.com"]
   gem.description   = <<-EOF.gsub(/^\s+/, '')
     Capistrano tasks for automatic  and sensible unicorn + nginx configuraion.
 
