@@ -1,0 +1,83 @@
+<% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert %>
+# source: http://forum.nginx.org/read.php?2,236546,236596
+map $ssl_client_raw_cert $a {
+    "~^(-.*-\n)(?<1st>[^\n]+)\n((?<b>[^\n]+)\n)?((?<c>[^\n]+)\n)?((?<d>[^\n]+)\n)?((?<e>[^\n]+)\n)?((?<f>[^\n]+)\n)?((?<g>[^\n]+)\n)?((?<h>[^\n]+)\n)?((?<i>[^\n]+)\n)?((?<j>[^\n]+)\n)?((?<k>[^\n]+)\n)?((?<l>[^\n]+)\n)?((?<m>[^\n]+)\n)?((?<n>[^\n]+)\n)?((?<o>[^\n]+)\n)?((?<p>[^\n]+)\n)?((?<q>[^\n]+)\n)?((?<r>[^\n]+)\n)?((?<s>[^\n]+)\n)?((?<t>[^\n]+)\n)?((?<v>[^\n]+)\n)?((?<u>[^\n]+)\n)?((?<w>[^\n]+)\n)?((?<x>[^\n]+)\n)?((?<y>[^\n]+)\n)?((?<z>[^\n]+)\n)?(-.*-)$" $1st;
+}
+<% end %>
+
+server {
+<% if fetch(:nginx_use_ssl) %>
+    <% if fetch(:nginx_use_spdy) %>
+    listen <%= ssl_port %> spdy;
+    <% else %>
+    listen <%= ssl_port %>;
+    <% end %>
+    ssl on;
+    ssl_certificate <%= nginx_ssl_cert_file %>;
+    ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
+<% else %>
+    listen 80;
+<% end %>
+
+<% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert %>
+    ssl_verify_client optional_no_ca;
+<% end %>
+
+    client_max_body_size 4G;
+    keepalive_timeout 10;
+
+    error_page 500 502 504 /500.html;
+    error_page 503 @503;
+
+    server_name <%= fetch(:nginx_server_name) %>;
+    root <%= current_path %>/public;
+    try_files $uri/index.html $uri @unicorn_<%= fetch(:nginx_config_name) %>;
+
+    location @unicorn_<%= fetch(:nginx_config_name) %> {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        <% if fetch(:nginx_use_ssl) %>
+        proxy_set_header X-Forwarded-Proto https;
+        <% end %>
+        <% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert %>
+        # source: http://forum.nginx.org/read.php?2,236546,236596
+        proxy_set_header X-Client-Cert $a$b$c$d$e$f$g$h$i$j$k$l$m$n$o$p$q$r$s$t$v$u$w$x$y$z;
+        <% end %>
+
+        proxy_pass http://unicorn_<%= fetch(:nginx_config_name) %>;
+        # limit_req zone=one;
+        access_log <%= nginx_access_log_file %>;
+        error_log <%= nginx_error_log_file %>;
+    }
+
+    location ^~ /assets/ {
+        gzip_static on;
+        expires max;
+        add_header Cache-Control public;
+    }
+
+    location = /50x.html {
+        root html;
+    }
+
+    location = /404.html {
+        root html;
+    }
+
+    location @503 {
+        error_page 405 = /system/maintenance.html;
+        if (-f $document_root/system/maintenance.html) {
+            rewrite ^(.*)$ /system/maintenance.html break;
+        }
+        rewrite ^(.*)$ /503.html break;
+    }
+
+    if ($request_method !~ ^(GET|HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$ ){
+        return 405;
+    }
+
+    if (-f $document_root/system/maintenance.html) {
+        return 503;
+    }
+}

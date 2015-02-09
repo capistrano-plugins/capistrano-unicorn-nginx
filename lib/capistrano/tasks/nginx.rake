@@ -13,6 +13,8 @@ namespace :load do
     # ssl options
     set :nginx_location, '/etc/nginx'
     set :nginx_use_ssl, false
+    # if true, passes the SSL client certificate to the application server for consumption in Ruby code
+    set :nginx_pass_ssl_client_cert, false
     set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
     set :nginx_ssl_cert_key, -> { nginx_default_ssl_cert_key_file_name }
     set :nginx_upload_local_cert, true

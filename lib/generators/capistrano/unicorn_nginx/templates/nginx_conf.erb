@@ -16,71 +16,10 @@ server {
 }
 <% end %>
 
-server {
-<% if fetch(:nginx_use_ssl) %>
-  <% if fetch(:nginx_use_spdy) %>
-  listen 443 spdy;
-  <% else %>
-  listen 443;
-  <% end %>
-  ssl on;
-  ssl_certificate <%= nginx_ssl_cert_file %>;
-  ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
-<% else %>
-  listen 80;
+<% # render the default server directive. If SSL is enabled, port 443 is used %>
+<%= template_to_s("_default_server_directive.erb", ssl_port: 443, nginx_pass_ssl_client_cert: false).to_s %>
+
+<% if fetch(:nginx_pass_ssl_client_cert) %>
+<% # render the server directive with SSL client certificate authentication enabled on port 444 %>
+<%= template_to_s("_default_server_directive.erb", ssl_port: 444, nginx_pass_ssl_client_cert: true).to_s %>
 <% end %>
-
-  client_max_body_size 4G;
-  keepalive_timeout 10;
-
-  error_page 500 502 504 /500.html;
-  error_page 503 @503;
-
-  server_name <%= fetch(:nginx_server_name) %>;
-  root <%= current_path %>/public;
-  try_files $uri/index.html $uri @unicorn_<%= fetch(:nginx_config_name) %>;
-
-  location @unicorn_<%= fetch(:nginx_config_name) %> {
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header Host $http_host;
-    proxy_redirect off;
-<% if fetch(:nginx_use_ssl) %>
-    proxy_set_header X-Forwarded-Proto https;
-<% end %>
-    proxy_pass http://unicorn_<%= fetch(:nginx_config_name) %>;
-    # limit_req zone=one;
-    access_log <%= nginx_access_log_file %>;
-    error_log <%= nginx_error_log_file %>;
-  }
-
-  location ^~ /assets/ {
-    gzip_static on;
-    expires max;
-    add_header Cache-Control public;
-  }
-
-  location = /50x.html {
-    root html;
-  }
-
-  location = /404.html {
-    root html;
-  }
-
-  location @503 {
-    error_page 405 = /system/maintenance.html;
-    if (-f $document_root/system/maintenance.html) {
-      rewrite ^(.*)$ /system/maintenance.html break;
-    }
-    rewrite ^(.*)$ /503.html break;
-  }
-
-  if ($request_method !~ ^(GET|HEAD|PUT|PATCH|POST|DELETE|OPTIONS)$ ){
-    return 405;
-  }
-
-  if (-f $document_root/system/maintenance.html) {
-    return 503;
-  }
-
-}
