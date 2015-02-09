@@ -10,7 +10,7 @@ listen "/tmp/unicorn.<%= fetch(:nginx_config_name) %>.sock"
 <% end %>
 
 worker_processes <%= fetch(:unicorn_workers) %>
-timeout 30
+timeout <%= fetch(:unicorn_worker_timeout) %>
 
 preload_app true
 
