@@ -2,6 +2,10 @@
 
 ### master
 
+### v3.3.0, 2015-02-09
+- added client SSL authentication (@rhomeister)
+- make unicorn timeout configurable (@vicentllongo)
+
 ### v3.2.0, 2015-01-28
 - allow 'PATCH' HTTP method in nginx_conf (@lonre)
 - added SPDY support (@rhomeister)
