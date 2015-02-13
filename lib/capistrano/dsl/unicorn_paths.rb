@@ -14,14 +14,21 @@ module Capistrano
         shared_path.join('tmp/pids/unicorn.pid')
       end
 
+      def unicorn_log_dir
+        shared_path.join('log')
+      end
+
       def unicorn_log_file
-        shared_path.join('log/unicorn.stdout.log')
+        log_dir.join('unicorn.stdout.log')
       end
 
       def unicorn_error_log_file
-        shared_path.join('log/unicorn.stderr.log')
+        log_dir.join('unicorn.stderr.log')
       end
 
+      def unicorn_default_logrotate_config_file
+        "/etc/logrotate.d/#{fetch(:unicorn_service)}"
+      end
     end
   end
 end

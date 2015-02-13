@@ -10,12 +10,15 @@ namespace :load do
     set :templates_path, 'config/deploy/templates'
     set :unicorn_pid, -> { unicorn_default_pid_file }
     set :unicorn_config, -> { unicorn_default_config_file }
+    set :unicorn_logrotate_config, -> { unicorn_default_logrotate_config_file }
     set :unicorn_workers, 2
     set :unicorn_worker_timeout, 30
     set :unicorn_tcp_listen_port, 8080
     set :unicorn_use_tcp, -> { roles(:app, :web).count > 1 } # use tcp if web and app nodes are on different servers
     set :unicorn_app_env, -> { fetch(:rails_env) || fetch(:stage) }
     # set :unicorn_user # default set in `unicorn:defaults` task
+
+    set :unicorn_logrotate_enabled, false # by default, don't use logrotate to rotate unicorn logs
 
     set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids')
   end
@@ -46,6 +49,15 @@ namespace :unicorn do
     end
   end
 
+  desc 'Setup logrotate configuration'
+  task :setup_logrotate do
+    on roles :app do
+      sudo :mkdir, '-pv', File.dirname(fetch(:unicorn_logrotate_config))
+      sudo_upload! template('unicorn-logrotate.rb.erb'), fetch(:unicorn_logrotate_config)
+      sudo 'chown', 'root:root', fetch(:unicorn_logrotate_config)
+    end
+  end
+
   %w[start stop restart].each do |command|
     desc "#{command} unicorn"
     task command do
@@ -56,6 +68,7 @@ namespace :unicorn do
   end
 
   before :setup_initializer, :defaults
+  before :setup_logrotate, :defaults
 
 end
 
@@ -67,4 +80,7 @@ desc 'Server setup tasks'
 task :setup do
   invoke 'unicorn:setup_initializer'
   invoke 'unicorn:setup_app_config'
+  if fetch(:unicorn_logrotate_enabled)
+    invoke 'unicorn:setup_logrotate'
+  end
 end
