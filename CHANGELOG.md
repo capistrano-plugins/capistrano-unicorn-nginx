@@ -2,6 +2,10 @@
 
 ### master
 
+### v3.3.1, 2015-02-16
+- made nginx fail_timeout configurable (@rhomeister)
+- added logrotate configuration for nginx logs (@rhomeister)
+
 ### v3.3.0, 2015-02-09
 - added client SSL authentication (@rhomeister)
 - make unicorn timeout configurable (@vicentllongo)
