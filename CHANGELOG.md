@@ -2,6 +2,9 @@
 
 ### master
 
+### v3.3.2, 2015-02-16
+- bug fix: replaced non-existent `log_dir` with `unicorn_log_dir` (@rhomeister)
+
 ### v3.3.1, 2015-02-16
 - made nginx fail_timeout configurable (@rhomeister)
 - added logrotate configuration for nginx logs (@rhomeister)

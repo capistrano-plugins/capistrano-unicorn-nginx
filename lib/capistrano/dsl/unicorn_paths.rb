@@ -19,11 +19,11 @@ module Capistrano
       end
 
       def unicorn_log_file
-        log_dir.join('unicorn.stdout.log')
+        unicorn_log_dir.join('unicorn.stdout.log')
       end
 
       def unicorn_error_log_file
-        log_dir.join('unicorn.stderr.log')
+        unicorn_log_dir.join('unicorn.stderr.log')
       end
 
       def unicorn_default_logrotate_config_file
