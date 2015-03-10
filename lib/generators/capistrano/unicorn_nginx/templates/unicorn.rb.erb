@@ -3,11 +3,11 @@ pid "<%= fetch(:unicorn_pid) %>"
 stdout_path "<%= unicorn_log_file %>"
 stderr_path "<%= unicorn_error_log_file %>"
 
-<% if fetch(:unicorn_use_tcp) %>
+<% if fetch(:unicorn_use_tcp) -%>
 listen <%= fetch(:unicorn_tcp_listen_port) %>
-<% else %>
+<% else -%>
 listen "/tmp/unicorn.<%= fetch(:nginx_config_name) %>.sock"
-<% end %>
+<% end -%>
 
 worker_processes <%= fetch(:unicorn_workers) %>
 timeout <%= fetch(:unicorn_worker_timeout) %>
