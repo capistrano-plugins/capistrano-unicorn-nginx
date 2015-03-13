@@ -41,7 +41,7 @@ namespace :unicorn do
 
   desc 'Setup Unicorn initializer'
   task :setup_initializer do
-    next unless fetch(:setup_unicorn_inti)
+    next unless fetch(:setup_unicorn_init)
     on roles :app do
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
