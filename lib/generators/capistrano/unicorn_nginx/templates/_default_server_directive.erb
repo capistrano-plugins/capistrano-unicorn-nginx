@@ -50,10 +50,15 @@ server {
         access_log <%= nginx_access_log_file %>;
         error_log <%= nginx_error_log_file %>;
     }
+    
+    location ~* "-[a-z0-9]{32}\.(png|gif|jpg|jpeg|css|js)$" {
+        gzip_static on;
+        expires max;
+        add_header Cache-Control public;
+    }
 
     location ^~ /assets/ {
         gzip_static on;
-        expires max;
         add_header Cache-Control public;
     }
 
