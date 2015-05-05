@@ -2,6 +2,9 @@
 
 ### master
 
+### v3.3.3, 2015-05-05
+- add `unicorn_env` option for passing environmental variables to unicorn (@rhomeister)
+
 ### v3.3.2, 2015-02-16
 - bug fix: replaced non-existent `log_dir` with `unicorn_log_dir` (@rhomeister)
 

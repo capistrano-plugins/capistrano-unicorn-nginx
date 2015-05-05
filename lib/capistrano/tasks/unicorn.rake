@@ -12,6 +12,7 @@ namespace :load do
     set :unicorn_config, -> { unicorn_default_config_file }
     set :unicorn_logrotate_config, -> { unicorn_default_logrotate_config_file }
     set :unicorn_workers, 2
+    set :unicorn_env, "" # environmental variables passed to unicorn/Ruby. Useful for GC tweaking, etc
     set :unicorn_worker_timeout, 30
     set :unicorn_tcp_listen_port, 8080
     set :unicorn_use_tcp, -> { roles(:app, :web).count > 1 } # use tcp if web and app nodes are on different servers

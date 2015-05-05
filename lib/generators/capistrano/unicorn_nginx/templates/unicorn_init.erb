@@ -16,7 +16,8 @@ APP_ROOT=<%= current_path %>
 PID=<%= fetch(:unicorn_pid) %>
 
 AS_USER=<%= fetch(:unicorn_user) %>
-CMD="export HOME; true "${HOME:=$(getent passwd "$AS_USER" | cut -d: -f6;)}" ; cd $APP_ROOT && <%= bundle_unicorn("-D -c", fetch(:unicorn_config), "-E", fetch(:unicorn_app_env)) %>"
+UNICORN_ENV="<%= fetch(:unicorn_env) %>"
+CMD="export HOME; true "${HOME:=$(getent passwd "$AS_USER" | cut -d: -f6;)}" ; cd $APP_ROOT && $UNICORN_ENV <%= bundle_unicorn("-D -c", fetch(:unicorn_config), "-E", fetch(:unicorn_app_env)) %>"
 
 set -u
 
