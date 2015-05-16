@@ -22,6 +22,9 @@ namespace :load do
     set :nginx_ssl_cert_local_path, -> { ask(:nginx_ssl_cert_local_path, 'Local path to ssl certificate: ') }
     set :nginx_ssl_cert_key_local_path, -> { ask(:nginx_ssl_cert_key_local_path, 'Local path to ssl certificate key: ') }
     set :nginx_fail_timeout, 0 # see http://nginx.org/en/docs/http/ngx_http_upstream_module.html#fail_timeout
+    # ports
+    set :nginx_http_port, 80
+    set :nginx_https_port, 443
 
     set :linked_dirs, fetch(:linked_dirs, []).push('log')
   end

@@ -8,15 +8,15 @@ map $ssl_client_raw_cert $a {
 server {
 <% if fetch(:nginx_use_ssl) %>
     <% if fetch(:nginx_use_spdy) %>
-    listen <%= ssl_port %> spdy;
+    listen <%= fetch(:nginx_https_port) + ( nginx_pass_ssl_client_cert ? 1 : 0) %> spdy;
     <% else %>
-    listen <%= ssl_port %>;
+    listen <%= fetch(:nginx_https_port) + (nginx_pass_ssl_client_cert ? 1 : 0) %>;
     <% end %>
     ssl on;
     ssl_certificate <%= nginx_ssl_cert_file %>;
     ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
 <% else %>
-    listen 80;
+    listen <%= fetch(:nginx_http_port) %>;
 <% end %>
 
 <% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert %>
