@@ -16,7 +16,7 @@ server {
     ssl_certificate <%= nginx_ssl_cert_file %>;
     ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
 <% else %>
-    listen 80;
+    listen <%= fetch(:nginx_listen) %>;
 <% end %>
 
 <% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert %>
