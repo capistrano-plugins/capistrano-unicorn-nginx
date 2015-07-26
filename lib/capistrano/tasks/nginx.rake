@@ -1,8 +1,10 @@
 require 'capistrano/dsl/nginx_paths'
+require 'capistrano/dsl/nginx_listening'
 require 'capistrano/unicorn_nginx/helpers'
 
 include Capistrano::UnicornNginx::Helpers
 include Capistrano::DSL::NginxPaths
+include Capistrano::DSL::NginxListening
 
 namespace :load do
   task :defaults do
