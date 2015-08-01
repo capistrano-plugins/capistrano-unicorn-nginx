@@ -1,14 +1,17 @@
 require 'capistrano/dsl/nginx_paths'
+require 'capistrano/dsl/nginx_listening'
 require 'capistrano/unicorn_nginx/helpers'
 
 include Capistrano::UnicornNginx::Helpers
 include Capistrano::DSL::NginxPaths
+include Capistrano::DSL::NginxListening
 
 namespace :load do
   task :defaults do
     set :templates_path, 'config/deploy/templates'
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, nginx_default_pid_file
+    set :nginx_listen, nginx_default_listen_server
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
     set :nginx_location, '/etc/nginx'
