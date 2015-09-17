@@ -63,7 +63,12 @@ namespace :unicorn do
     desc "#{command} unicorn"
     task command do
       on roles :app do
-        execute :service, fetch(:unicorn_service), command
+        uname = capture(:uname, '-a')
+        if /Debian \d.+ GNU\/Linux$/ =~ uname
+          sudo :service, fetch(:unicorn_service), command
+        else
+          execute :service, fetch(:unicorn_service), command
+        end
       end
     end
   end
