@@ -18,6 +18,8 @@ namespace :load do
     set :nginx_pass_ssl_client_cert, false
     set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
     set :nginx_ssl_cert_key, -> { nginx_default_ssl_cert_key_file_name }
+    set :nginx_ssl_cert_path, -> { nginx_default_ssl_cert_file_path }
+    set :nginx_ssl_cert_key_path, -> { nginx_default_ssl_cert_key_file_path }
     set :nginx_upload_local_cert, true
     set :nginx_ssl_cert_local_path, -> { ask(:nginx_ssl_cert_local_path, 'Local path to ssl certificate: ') }
     set :nginx_ssl_cert_key_local_path, -> { ask(:nginx_ssl_cert_key_local_path, 'Local path to ssl certificate key: ') }
