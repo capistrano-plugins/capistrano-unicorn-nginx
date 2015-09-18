@@ -9,14 +9,14 @@ server {
 <% if fetch(:nginx_use_ssl) -%>
     <% if fetch(:nginx_use_spdy) -%>
     listen <%= ssl_port %> spdy;
-    <% else %>
+    <% else -%>
     listen <%= ssl_port %>;
-    <% end %>
+    <% end -%>
     ssl on;
     ssl_certificate <%= nginx_ssl_cert_file %>;
     ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
 <% else -%>
-    listen 80;
+    listen <%= fetch(:nginx_server_port) %>;
 <% end -%>
 
 <% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert -%>
@@ -37,6 +37,9 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
         proxy_redirect off;
+        <% if fetch(:nginx_read_timeout) -%>
+        proxy_read_timeout <%= fetch(:nginx_read_timeout) %>;
+        <% end -%>
         <% if fetch(:nginx_use_ssl) -%>
         proxy_set_header X-Forwarded-Proto https;
         <% end -%>
