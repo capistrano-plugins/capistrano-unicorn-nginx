@@ -65,9 +65,9 @@ namespace :unicorn do
     desc "#{command} unicorn"
     task command do
       on roles :app do
-        # sudo 'service', fetch(:unicorn_service), command
+        sudo 'service', fetch(:unicorn_service), command
         # for some reason i kept getting command not found here
-        `sudo service #{fetch(:unicorn_service)} #{command}`
+        # `sudo service #{fetch(:unicorn_service)} #{command}`
       end
     end
   end
