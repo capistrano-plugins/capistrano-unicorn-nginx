@@ -10,6 +10,10 @@ module Capistrano
         "#{fetch(:nginx_location)}/sites-enabled/#{fetch(:nginx_config_name)}"
       end
 
+      def centos_nginx_conf_file
+        "#{fetch(:nginx_location)}/conf.d/#{fetch(:nginx_config_name)}.conf"
+      end
+
       def nginx_service_path
         '/etc/init.d/nginx'
       end

@@ -1,3 +1,6 @@
+# This Fork
+This fork provides specific adjustments in order to make it compatible with RedHat-like OS's.
+
 # Capistrano::UnicornNginx
 
 Capistrano tasks for automatic and sensible unicorn + nginx configuraion.
