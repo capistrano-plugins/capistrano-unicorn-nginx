@@ -62,12 +62,12 @@ namespace :unicorn do
   end
 
   %w[start stop restart].each do |command|
-    desc "#{command} unicorn!"
+    desc "#{command} unicorn"
     task command do
       on roles :app do
         # sudo 'service', fetch(:unicorn_service), command
         # for some reason i kept getting command not found here
-        `sudo service unicorn_deal_digger_production #{command}`
+        `sudo service #{fetch(:unicorn_service)} #{command}`
       end
     end
   end
