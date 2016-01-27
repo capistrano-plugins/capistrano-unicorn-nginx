@@ -1,5 +1,8 @@
 # This Fork
+
 This fork provides specific adjustments in order to make it compatible with RedHat-like OS's.
+
+All credit to irlrobot.
 
 # Capistrano::UnicornNginx
 
