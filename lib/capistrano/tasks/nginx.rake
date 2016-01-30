@@ -62,10 +62,16 @@ namespace :nginx do
     end
   end
 
-  desc 'Reload nginx configuration'
-  task :reload do
-    on roles :web do
-      sudo nginx_service_path, 'reload'
+  # will generate all commands that nginx supports, for instance:
+  # cap ENV nginx:start
+  # cap ENV nginx:reload
+  # cap ENV nginx:configtest
+  %w(start stop reload configtest status force-reload upgrade restart reopen_logs).each do |tsk|
+    desc %('#{tsk.capitalize}' nginx command)
+    task tsk do
+      on roles :web do
+        sudo nginx_service_path, tsk
+      end
     end
   end
 
