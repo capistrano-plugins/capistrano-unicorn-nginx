@@ -1,6 +1,12 @@
 # This Fork
 
-This fork provides specific adjustments in order to make it compatible with RedHat-like OS's.
+This fork provides specific adjustments to work with Amazon Linux (which in turn is Redhat-based).
+
+This means that some commands are different:
+
+* using `chkconfig` instead of update-rc.d
+* assuming `nginx` is installed and available at `/etc/nginx`
+* assuming configuration for nginx lives at `/etc/conf.d/[ENV_NAME].conf
 
 All credit to irlrobot.
 
