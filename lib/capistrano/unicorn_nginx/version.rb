@@ -1,5 +1,5 @@
 module Capistrano
   module UnicornNginx
-    VERSION = "3.4.0"
+    VERSION = "4.0.0"
   end
 end
