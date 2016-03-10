@@ -26,7 +26,6 @@ namespace :load do
 end
 
 namespace :unicorn do
-
   task :defaults do
     on roles :app do
       set :unicorn_user, fetch(:unicorn_user, deploy_user)
@@ -61,7 +60,7 @@ namespace :unicorn do
     end
   end
 
-  %w[start stop restart].each do |command|
+  %w(start stop restart upgrade).each do |command|
     desc "#{command} unicorn"
     task command do
       on roles :app do
@@ -78,7 +77,7 @@ namespace :unicorn do
 end
 
 namespace :deploy do
-  after :publishing, 'unicorn:restart'
+  after :publishing, 'unicorn:upgrade'
 end
 
 desc 'Server setup tasks'
