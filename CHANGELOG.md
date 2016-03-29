@@ -2,11 +2,14 @@
 
 ### master
 
+### v4.0.0, 2016-03-29
+- Improves SSL security and performance. Breaking changes with 3.4.0. Please
+  read README.md
+
 ### v3.4.0, 2015-09-17
 - Allow customizing paths for SSL certificate and key
 - Use sudo to restart services
 - Remove whitespace in template ERB files
-
 
 ### v3.3.3, 2015-05-05
 - add `unicorn_env` option for passing environmental variables to unicorn (@rhomeister)

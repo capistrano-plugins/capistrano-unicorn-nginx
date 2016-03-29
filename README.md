@@ -1,5 +1,13 @@
 # Capistrano::UnicornNginx
 
+> IMPORTANT NOTE. When upgrading to 4.0.0, please ensure you have
+> generated a new 2048 bits Diffie-Hellman group. Run the following command 
+> on your server before installing this gem:
+>
+> `openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048` 
+>
+> See <https://weakdh.org/sysadmin.html> for more details.
+
 Capistrano tasks for automatic and sensible unicorn + nginx configuraion.
 
 Goals of this plugin:
