@@ -9,6 +9,10 @@ namespace :load do
     set :templates_path, 'config/deploy/templates'
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, nginx_default_pid_file
+    # if true setup nginx config 
+    set :setup_nginx, true
+    # if true reload nginx on deploy
+    set :nginx_reload, true
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
     set :nginx_location, '/etc/nginx'
@@ -41,6 +45,7 @@ namespace :nginx do
 
   desc 'Setup nginx configuration'
   task :setup do
+    next unless fetch(:setup_nginx)
     on roles :web do
       sudo_upload! template('nginx_conf.erb'), nginx_sites_available_file
       sudo :ln, '-fs', nginx_sites_available_file, nginx_sites_enabled_file
@@ -63,6 +68,7 @@ namespace :nginx do
 
   desc 'Reload nginx configuration'
   task :reload do
+    next unless fetch(:nginx_reload)
     on roles :web do
       sudo nginx_service_path, 'reload'
     end

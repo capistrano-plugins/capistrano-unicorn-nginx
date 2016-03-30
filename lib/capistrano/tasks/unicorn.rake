@@ -18,6 +18,13 @@ namespace :load do
     set :unicorn_use_tcp, -> { roles(:app, :web).count > 1 } # use tcp if web and app nodes are on different servers
     set :unicorn_app_env, -> { fetch(:rails_env) || fetch(:stage) }
     # set :unicorn_user # default set in `unicorn:defaults` task
+    #
+    # if true setup unicorn init 
+    set :setup_unicorn_init, true
+    # if true setup unicorn config
+    set :setup_unicorn_config, true
+    # if true can start, stop, restart unicorn
+    set :manage_unicorn, true
 
     set :unicorn_logrotate_enabled, false # by default, don't use logrotate to rotate unicorn logs
 
@@ -35,6 +42,7 @@ namespace :unicorn do
 
   desc 'Setup Unicorn initializer'
   task :setup_initializer do
+    next unless fetch(:setup_unicorn_init)
     on roles :app do
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
@@ -44,6 +52,7 @@ namespace :unicorn do
 
   desc 'Setup Unicorn app configuration'
   task :setup_app_config do
+    next unless fetch(:setup_unicorn_config)
     on roles :app do
       execute :mkdir, '-pv', File.dirname(fetch(:unicorn_config))
       upload! template('unicorn.rb.erb'), fetch(:unicorn_config)
@@ -62,6 +71,7 @@ namespace :unicorn do
   %w[start stop restart].each do |command|
     desc "#{command} unicorn"
     task command do
+      next unless fetch(:manage_unicorn)
       on roles :app do
         sudo 'service', fetch(:unicorn_service), command
       end
