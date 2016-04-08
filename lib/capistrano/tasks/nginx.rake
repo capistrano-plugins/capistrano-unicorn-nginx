@@ -80,9 +80,11 @@ namespace :nginx do
 
   desc 'service startup on restart'
   task 'service_startup' do
+    on roles :web do
       # should be done already:
       sudo 'chkconfig', '--add', nginx_service_name
       sudo 'chkconfig', nginx_service_name, 'on'
+    end
   end
   after :setup, :service_startup
 end
