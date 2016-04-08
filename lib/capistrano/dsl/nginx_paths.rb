@@ -18,6 +18,10 @@ module Capistrano
         '/etc/init.d/nginx'
       end
 
+      def nginx_service_name
+        'nginx'
+      end
+
       def nginx_default_pid_file
         '/run/nginx.pid'
       end
