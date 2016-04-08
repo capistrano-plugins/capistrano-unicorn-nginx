@@ -73,11 +73,10 @@ namespace :unicorn do
 
   before :setup_initializer, :defaults
   before :setup_logrotate, :defaults
-
 end
 
 namespace :deploy do
-  after :publishing, 'unicorn:upgrade'
+  after :publishing, 'unicorn:restart'
 end
 
 desc 'Server setup tasks'
