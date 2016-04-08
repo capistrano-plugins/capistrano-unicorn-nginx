@@ -78,6 +78,13 @@ namespace :nginx do
   before :setup, :defaults
   before :setup_ssl, :defaults
 
+  desc 'service startup on restart'
+  task 'service_startup' do
+      # should be done already:
+      sudo 'chkconfig', '--add', nginx_service_name
+      sudo 'chkconfig', nginx_service_name, 'on'
+  end
+  after :setup, :service_startup
 end
 
 namespace :deploy do
