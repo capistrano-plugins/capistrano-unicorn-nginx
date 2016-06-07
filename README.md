@@ -6,9 +6,40 @@ This means that some commands are different:
 
 * using `chkconfig` instead of update-rc.d
 * assuming `nginx` is installed and available at `/etc/nginx`
-* assuming configuration for nginx lives at `/etc/conf.d/[ENV_NAME].conf
+* assuming configuration for nginx lives at `/etc/conf.d/[ENV_NAME].conf`
 
 All credit to irlrobot.
+
+# NOTE: This fork has different version numbers!
+
+Since I made this fork, in order to use the release pages on github, I decided
+to move forward and put new version numbers.
+
+So beware that version numbers differ from v4.0.0 and onwards.
+
+# unicorn:restart vs unicorn:upgrade
+
+For backwards compatibility, this plugin will run `sudo service unicorn restart`,
+which reloads processes but doesn't pick up code changes.
+
+Typically you would want to use `unicorn:upgrade` instead (picks up code changes).
+
+put the following snippet in your `deploy.rb`:
+
+```
+# clear originating task before replacing it
+Rake::Task['unicorn:restart_command'].clear_actions
+namespace :unicorn do
+  task :restart_command do
+    invoke 'unicorn:upgrade'
+  end
+end
+```
+
+
+
+-----
+
 
 # Capistrano::UnicornNginx
 
