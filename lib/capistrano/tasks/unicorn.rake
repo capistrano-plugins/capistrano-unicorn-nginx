@@ -62,21 +62,28 @@ namespace :unicorn do
 
   %w(start stop restart upgrade).each do |command|
     desc "#{command} unicorn"
+    desc "run unicorn #{command} command"
     task command do
       on roles :app do
         sudo 'service', fetch(:unicorn_service), command
-        # for some reason i kept getting command not found here
-        # `sudo service #{fetch(:unicorn_service)} #{command}`
       end
     end
   end
 
   before :setup_initializer, :defaults
   before :setup_logrotate, :defaults
+
+  # overridable command for restarting the unicorn proces. Typically
+  # you would want to use `unicorn:upgrade` instead (picks up code changes).
+  #
+  # See example for overriding in the README
+  task :restart_command do
+    invoke 'unicorn:restart'
+  end
 end
 
 namespace :deploy do
-  after :publishing, 'unicorn:restart'
+  after :publishing, 'unicorn:restart_command'
 end
 
 desc 'Server setup tasks'
