@@ -2,11 +2,25 @@
 
 ### master
 
+### v4.2.0, 2015-06-07
+- Fix possibility to use unicorn:upgrade as restarting command
+- Added usage notes in README
+
+### v4.1.1, 2015-04-08
+- Fix task "cap nginx:service_startup"
+
+### v4.1.0, 2015-04-08
+- nginx:service_on for runlevel
+
+### v4.0.0, 2016-01-30
+- First release on jesperronn fork with independent version numbers
+  (differs from upstream source)
+- More nginx commands, for example 'nginx:start'
+
 ### v3.4.0, 2015-09-17
 - Allow customizing paths for SSL certificate and key
 - Use sudo to restart services
 - Remove whitespace in template ERB files
-
 
 ### v3.3.3, 2015-05-05
 - add `unicorn_env` option for passing environmental variables to unicorn (@rhomeister)
