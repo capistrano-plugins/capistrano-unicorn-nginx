@@ -7,7 +7,7 @@ include Capistrano::DSL::NginxPaths
 namespace :load do
   task :defaults do
     set :templates_path, 'config/deploy/templates'
-    set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
+    set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}.conf" }
     set :nginx_pid, nginx_default_pid_file
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
@@ -26,6 +26,12 @@ namespace :load do
     set :nginx_fail_timeout, 0 # see http://nginx.org/en/docs/http/ngx_http_upstream_module.html#fail_timeout
     set :nginx_read_timeout, nil
 
+    # add this scripts via visudo to your deployer user
+    # EXAMPLE: 
+    # deployer ALL=(ALL) NOPASSWD: /bin/capistrano_*
+    set :nginx_reload_script_path, '/bin/capistrano_nginx_reload'
+    set :nginx_enable_script_path, '/bin/capistrano_nginx_enable'
+
     set :linked_dirs, fetch(:linked_dirs, []).push('log')
   end
 end
@@ -42,8 +48,8 @@ namespace :nginx do
   desc 'Setup nginx configuration'
   task :setup do
     on roles :web do
-      sudo_upload! template('nginx_conf.erb'), nginx_sites_available_file
-      sudo :ln, '-fs', nginx_sites_available_file, nginx_sites_enabled_file
+      upload! template('nginx_conf.erb'), nginx_sites_available_file
+      sudo fetch(:nginx_enable_script_path), nginx_sites_available_file, fetch(:nginx_config_name)
     end
   end
 
@@ -64,7 +70,7 @@ namespace :nginx do
   desc 'Reload nginx configuration'
   task :reload do
     on roles :web do
-      sudo nginx_service_path, 'reload'
+      sudo fetch(:nginx_reload_script_path)
     end
   end
 

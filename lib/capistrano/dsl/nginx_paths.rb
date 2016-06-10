@@ -3,7 +3,7 @@ module Capistrano
     module NginxPaths
 
       def nginx_sites_available_file
-        "#{fetch(:nginx_location)}/sites-available/#{fetch(:nginx_config_name)}"
+        "#{shared_path.join('config')}/#{fetch(:nginx_config_name)}"
       end
 
       def nginx_sites_enabled_file

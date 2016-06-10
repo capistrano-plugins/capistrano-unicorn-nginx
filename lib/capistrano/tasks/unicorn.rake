@@ -19,9 +19,15 @@ namespace :load do
     set :unicorn_app_env, -> { fetch(:rails_env) || fetch(:stage) }
     # set :unicorn_user # default set in `unicorn:defaults` task
 
+
     set :unicorn_logrotate_enabled, false # by default, don't use logrotate to rotate unicorn logs
 
     set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids')
+
+    # add this scripts via visudo to your deployer user
+    # example: 
+    # deployer all=(all) nopasswd: /bin/capistrano_*
+    set :unicorn_enable_script_path, '/bin/capistrano_unicorn_enable'
   end
 end
 
@@ -36,9 +42,9 @@ namespace :unicorn do
   desc 'Setup Unicorn initializer'
   task :setup_initializer do
     on roles :app do
-      sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
+      upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
-      sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      sudo fetch(:unicorn_enable_script_path), unicorn_initd_file, fetch(:unicorn_service)
     end
   end
 
@@ -63,7 +69,7 @@ namespace :unicorn do
     desc "#{command} unicorn"
     task command do
       on roles :app do
-        sudo 'service', fetch(:unicorn_service), command
+        execute unicorn_initd_file, command
       end
     end
   end
@@ -79,8 +85,8 @@ end
 
 desc 'Server setup tasks'
 task :setup do
-  invoke 'unicorn:setup_initializer'
   invoke 'unicorn:setup_app_config'
+  invoke 'unicorn:setup_initializer'
   if fetch(:unicorn_logrotate_enabled)
     invoke 'unicorn:setup_logrotate'
   end
