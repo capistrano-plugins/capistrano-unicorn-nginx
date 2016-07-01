@@ -23,3 +23,11 @@ server {
 <% # render the server directive with SSL client certificate authentication enabled on port 444 %>
 <%= template_to_s("_default_server_directive.erb", ssl_port: 444, nginx_pass_ssl_client_cert: true).to_s %>
 <% end -%>
+
+<% if fetch(:nginx_redirect_server_name) -%>
+server {
+  listen      80; 
+  server_name  <%= fetch(:nginx_redirect_server_name) %>;
+  return 301 http://<%= fetch(:nginx_server_name) %>$request_uri;
+}
+<% end -%>

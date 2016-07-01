@@ -97,4 +97,11 @@ server {
     if (-f $document_root/system/maintenance.html) {
         return 503;
     }
+
+<% if fetch(:nginx_redirect_paths) -%>
+  <% fetch(:nginx_redirect_paths).each do |p| -%>
+  <%= "rewrite ^#{p[0]}$ http://#{fetch(:nginx_server_name)}#{p[1]} permanent;"%>
+  <% end -%>
+<% end -%>
+
 }
