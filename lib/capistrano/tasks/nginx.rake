@@ -6,14 +6,19 @@ include Capistrano::DSL::NginxPaths
 
 namespace :load do
   task :defaults do
+    set :root_name, 'root'
+    set :root_group, 'wheel'
     set :templates_path, 'config/deploy/templates'
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, nginx_default_pid_file
+    set :nginx_service_path, '/etc/init.d/nginx'
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
     set :nginx_location, '/etc/nginx'
     set :nginx_use_ssl, false
     set :nginx_use_spdy, false
+    # http v2 protocol
+    set :nginx_use_http_v2, false
     # if true, passes the SSL client certificate to the application server for consumption in Ruby code
     set :nginx_pass_ssl_client_cert, false
     set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
@@ -25,7 +30,8 @@ namespace :load do
     set :nginx_ssl_cert_key_local_path, -> { ask(:nginx_ssl_cert_key_local_path, 'Local path to ssl certificate key: ') }
     set :nginx_fail_timeout, 0 # see http://nginx.org/en/docs/http/ngx_http_upstream_module.html#fail_timeout
     set :nginx_read_timeout, nil
-
+    set :nginx_dhparam, '/etc/nginx/ssl/dhparam.pem'
+    
     set :linked_dirs, fetch(:linked_dirs, []).push('log')
   end
 end
@@ -55,9 +61,9 @@ namespace :nginx do
       if fetch(:nginx_upload_local_cert)
         sudo_upload! fetch(:nginx_ssl_cert_local_path), nginx_ssl_cert_file
         sudo_upload! fetch(:nginx_ssl_cert_key_local_path), nginx_ssl_cert_key_file
+        sudo :chown, "#{fetch(:root_name)}:#{fetch(:root_group)}", nginx_ssl_cert_file
+        sudo :chown, "#{fetch(:root_name)}:#{fetch(:root_group)}", nginx_ssl_cert_key_file
       end
-      sudo :chown, 'root:root', nginx_ssl_cert_file
-      sudo :chown, 'root:root', nginx_ssl_cert_key_file
     end
   end
 
