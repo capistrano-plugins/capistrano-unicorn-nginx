@@ -54,8 +54,8 @@ namespace :nginx do
     on roles :web do
       next if file_exists?(nginx_ssl_cert_file) && file_exists?(nginx_ssl_cert_key_file)
       if fetch(:nginx_upload_local_cert)
-        sudo_upload! fetch(:nginx_ssl_cert_local_path), nginx_ssl_cert_file
-        sudo_upload! fetch(:nginx_ssl_cert_key_local_path), nginx_ssl_cert_key_file
+        sudo_upload! File.expand_path(fetch(:nginx_ssl_cert_local_path)), nginx_ssl_cert_file
+        sudo_upload! File.expand_path(fetch(:nginx_ssl_cert_key_local_path)), nginx_ssl_cert_key_file
       end
       sudo :chown, 'root:root', nginx_ssl_cert_file
       sudo :chown, 'root:root', nginx_ssl_cert_key_file
