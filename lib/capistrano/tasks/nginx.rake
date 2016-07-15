@@ -9,6 +9,7 @@ namespace :load do
     set :templates_path, 'config/deploy/templates'
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, nginx_default_pid_file
+    set :nginx_service_path, '/etc/init.d/nginx'
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
     set :nginx_location, '/etc/nginx'
