@@ -35,7 +35,10 @@ module Capistrano
 
       def sudo_upload!(from, to)
         filename = File.basename(to)
+        puts filename
         to_dir = File.dirname(to)
+        puts "TO"
+        puts to_dir
         tmp_file = "#{fetch(:tmp_dir)}/#{filename}"
         upload! from, tmp_file
         sudo :mv, tmp_file, to_dir
