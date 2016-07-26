@@ -6,6 +6,7 @@ include Capistrano::DSL::UnicornPaths
 
 namespace :load do
   task :defaults do
+    set :unicorn_init_path, '/etc/init.d'
     set :unicorn_service, -> { "unicorn_#{fetch(:application)}_#{fetch(:stage)}" }
     set :templates_path, 'config/deploy/templates'
     set :unicorn_pid, -> { unicorn_default_pid_file }
