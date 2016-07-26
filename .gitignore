@@ -17,3 +17,4 @@ test/version_tmp
 tmp
 /vendor/ruby
 .idea
+/.c9
