@@ -19,6 +19,9 @@ namespace :load do
     set :unicorn_use_tcp, -> { roles(:app, :web).count > 1 } # use tcp if web and app nodes are on different servers
     set :unicorn_app_env, -> { fetch(:rails_env) || fetch(:stage) }
     # set :unicorn_user # default set in `unicorn:defaults` task
+    
+    set :unicorn_use_update_rc_d, true
+    set :unicorn_use_init_script, false
 
     set :unicorn_logrotate_enabled, false # by default, don't use logrotate to rotate unicorn logs
 
@@ -39,7 +42,7 @@ namespace :unicorn do
     on roles :app do
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
-      sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      sudo('update-rc.d', '-f', fetch(:unicorn_service), 'defaults') if fetch(:unicorn_use_update_rc_d)
     end
   end
 
@@ -56,7 +59,7 @@ namespace :unicorn do
     on roles :app do
       sudo :mkdir, '-pv', File.dirname(fetch(:unicorn_logrotate_config))
       sudo_upload! template('unicorn-logrotate.rb.erb'), fetch(:unicorn_logrotate_config)
-      sudo 'chown', 'root:root', fetch(:unicorn_logrotate_config)
+      sudo 'chown', "#{fetch(:root_name)}:#{fetch(:root_group)}", fetch(:unicorn_logrotate_config)
     end
   end
 
@@ -64,7 +67,11 @@ namespace :unicorn do
     desc "#{command} unicorn"
     task command do
       on roles :app do
-        sudo 'service', fetch(:unicorn_service), command
+        if fetch(:unicorn_use_init_script)
+          sudo unicorn_initd_file, command
+        else
+          sudo 'service', fetch(:unicorn_service), command
+        end
       end
     end
   end
