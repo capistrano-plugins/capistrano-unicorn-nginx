@@ -15,7 +15,7 @@ server {
     listen <%= ssl_port %>;
     <% end -%>
     ssl on;
-    <% if fetch(:nginx_ssl_cert) and fetch(:nginx_upload_local_cert) -%>
+    <% if fetch(:nginx_ssl_cert) and not fetch(:nginx_upload_local_cert) -%>
     ssl_certificate <%= fetch(:nginx_ssl_cert) %>;
     ssl_certificate_key <%= fetch(:nginx_ssl_cert_key) %>;
     <% else -%>
