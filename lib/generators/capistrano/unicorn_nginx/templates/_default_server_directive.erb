@@ -9,12 +9,20 @@ server {
 <% if fetch(:nginx_use_ssl) -%>
     <% if fetch(:nginx_use_spdy) -%>
     listen <%= ssl_port %> spdy;
+    <% elsif fetch(:nginx_use_http_v2) -%>
+    listen <%= ssl_port %> http2;
     <% else -%>
     listen <%= ssl_port %>;
     <% end -%>
     ssl on;
+    <% if fetch(:nginx_ssl_cert) and not fetch(:nginx_upload_local_cert) -%>
+    ssl_certificate <%= fetch(:nginx_ssl_cert) %>;
+    ssl_certificate_key <%= fetch(:nginx_ssl_cert_key) %>;
+    <% else -%>
     ssl_certificate <%= nginx_ssl_cert_file %>;
     ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
+    <% end-%>
+    
 
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
@@ -24,7 +32,7 @@ server {
 
     ssl_stapling on;
     ssl_stapling_verify on;
-    ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+    ssl_dhparam <%= fetch(:nginx_dhparam) %>;
 <% else -%>
     listen <%= fetch(:nginx_server_port) %>;
 <% end -%>

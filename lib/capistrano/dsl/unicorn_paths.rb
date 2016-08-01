@@ -3,7 +3,7 @@ module Capistrano
     module UnicornPaths
 
       def unicorn_initd_file
-        "/etc/init.d/#{fetch(:unicorn_service)}"
+        "#{fetch(:unicorn_init_path)}/#{fetch(:unicorn_service)}"
       end
 
       def unicorn_default_config_file
