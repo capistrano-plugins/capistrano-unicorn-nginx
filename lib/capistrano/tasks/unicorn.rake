@@ -59,11 +59,22 @@ namespace :unicorn do
     end
   end
 
-  %w[start stop restart reload].each do |command|
+  %w[start stop reload upgrade].each do |command|
     desc "#{command} unicorn"
     task command do
       on roles :app do
         sudo 'service', fetch(:unicorn_service), command
+      end
+    end
+  end
+
+  desc 'restart unicorn'
+  task 'restart' do
+    on roles :app do
+      if test "[ -f #{fetch(:unicorn_pid)} ]"
+        sudo 'service', fetch(:unicorn_service), 'upgrade'
+      else
+        sudo 'service', fetch(:unicorn_service), 'start'
       end
     end
   end
@@ -74,7 +85,7 @@ namespace :unicorn do
 end
 
 namespace :deploy do
-  after :publishing, 'unicorn:reload'
+  after :publishing, 'unicorn:restart'
 end
 
 desc 'Server setup tasks'
