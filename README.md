@@ -33,8 +33,8 @@ see below for all available tasks
 Add this to `Gemfile`:
 
     group :development do
-      gem 'capistrano', '~> 3.2.1'
-      gem 'capistrano-unicorn-nginx', '~> 3.2.0'
+      gem 'capistrano', '~> 3.6.1'
+      gem 'capistrano-unicorn-nginx', '~> 3.4.0'
     end
 
 And then:
