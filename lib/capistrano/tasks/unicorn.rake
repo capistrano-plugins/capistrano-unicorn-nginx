@@ -65,7 +65,7 @@ namespace :unicorn do
     end
   end
 
-  %w[start stop restart].each do |command|
+  %w[start stop restart reload].each do |command|
     desc "#{command} unicorn"
     task command do
       on roles :app do
@@ -80,7 +80,7 @@ namespace :unicorn do
 end
 
 namespace :deploy do
-  after :publishing, 'unicorn:restart'
+  after :publishing, 'unicorn:reload'
 end
 
 desc 'Server setup tasks'
