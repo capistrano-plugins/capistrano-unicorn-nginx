@@ -20,7 +20,8 @@ namespace :load do
     # set :unicorn_user # default set in `unicorn:defaults` task
 
     set :unicorn_logrotate_enabled, false # by default, don't use logrotate to rotate unicorn logs
-
+    
+    set :unicorn_sudo_cycle, true #use sudo for unicorn service cycling
     set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids')
   end
 end
@@ -63,7 +64,11 @@ namespace :unicorn do
     desc "#{command} unicorn"
     task command do
       on roles :app do
-        sudo 'service', fetch(:unicorn_service), command
+        if fetch(:unicorn_sudo_cycle)
+          sudo 'service', fetch(:unicorn_service), command
+        else
+          execute 'service', fetch(:unicorn_service), command
+        end
       end
     end
   end
