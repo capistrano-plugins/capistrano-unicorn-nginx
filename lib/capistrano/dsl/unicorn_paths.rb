@@ -6,6 +6,10 @@ module Capistrano
         "/etc/init.d/#{fetch(:unicorn_service)}"
       end
 
+      def unicorn_systemd_file
+        "/etc/systemd/system/#{fetch(:unicorn_service)}.service"
+      end
+
       def unicorn_default_config_file
         shared_path.join('config/unicorn.rb')
       end

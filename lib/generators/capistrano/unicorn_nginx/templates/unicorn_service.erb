@@ -1,0 +1,20 @@
+<% command = bundle_unicorn("-D -c", fetch(:unicorn_config), "-E", fetch(:unicorn_app_env)) %>
+[Unit]
+Description=Unicorn Server
+Wants=mysqld.service nginx.service postgresql.service
+After=redis.service mysqld.service postgresql.service
+
+[Service]
+User=<%= fetch(:unicorn_user) %>
+WorkingDirectory=<%= current_path %>
+Environment=RAILS_ENV=<%= fetch(:unicorn_app_env) %>
+<% command.environment_hash.each_pair do |key, value| %>
+  Environment=<%= key %>=<%= value %>
+<% end %>
+SyslogIdentifier=unicorn
+PIDFile=<%= fetch(:unicorn_pid) %>
+
+ExecStart=<%= command.to_s %>
+
+[Install]
+WantedBy=multi-user.target
