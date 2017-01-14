@@ -1,6 +1,7 @@
 # Changelog
 
-### master
+### v4.3.0 / 2017-01-14
+- Ability to update SSL certificate if already exists
 
 ### v4.2.0, 2015-06-07
 - Fix possibility to use unicorn:upgrade as restarting command
