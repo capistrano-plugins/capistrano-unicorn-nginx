@@ -48,11 +48,11 @@ namespace :nginx do
     end
   end
 
-  desc 'Setup nginx ssl certs'
+  desc 'Setup nginx ssl certs. Force override with FORCE=true'
   task :setup_ssl do
     next unless fetch(:nginx_use_ssl)
     on roles :web do
-      next if file_exists?(nginx_ssl_cert_file) && file_exists?(nginx_ssl_cert_key_file)
+      next if ENV['force'] != 'true' && file_exists?(nginx_ssl_cert_file) && file_exists?(nginx_ssl_cert_key_file)
       if fetch(:nginx_upload_local_cert)
         sudo_upload! fetch(:nginx_ssl_cert_local_path), nginx_ssl_cert_file
         sudo_upload! fetch(:nginx_ssl_cert_key_local_path), nginx_ssl_cert_key_file
