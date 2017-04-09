@@ -15,6 +15,8 @@ SyslogIdentifier=unicorn
 PIDFile=<%= fetch(:unicorn_pid) %>
 
 ExecStart=<%= command.to_s %>
+ExecReload=/bin/kill -s USR2 $MAINPID                                                                                                                                               
+ExecStop=/bin/kill -s QUIT $MAINPID                                                                                                                                            ExecStop=/bin/kill -s QUIT $MAINPID¬
 
 [Install]
 WantedBy=multi-user.target
