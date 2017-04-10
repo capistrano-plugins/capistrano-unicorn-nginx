@@ -42,7 +42,7 @@ namespace :unicorn do
         execute :chmod, '+x', unicorn_initd_file
         sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
       when :systemd
-        sudo_upload! template('unicorn_service.erb'), fetch(:unicorn_service)
+        sudo_upload! template('unicorn_service.erb'), unicorn_systemd_file
         sudo 'systemctl', 'daemon-reload'
       end
     end
