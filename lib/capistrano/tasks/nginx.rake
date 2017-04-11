@@ -6,6 +6,7 @@ include Capistrano::DSL::NginxPaths
 
 namespace :load do
   task :defaults do
+    set :init_system, :sysv
     set :templates_path, 'config/deploy/templates'
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, nginx_default_pid_file
@@ -65,7 +66,13 @@ namespace :nginx do
   desc 'Reload nginx configuration'
   task :reload do
     on roles :web do
-      sudo nginx_service_path, 'reload'
+      case fetch(:init_system)
+      when :sysv
+        sudo nginx_service_path, 'reload'
+      when :systemd
+        sudo "systemctl", "start", "nginx"
+        sudo "systemctl", "reload", "nginx"
+      end
     end
   end
 

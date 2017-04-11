@@ -5,7 +5,7 @@ module Capistrano
     module Helpers
 
       def bundle_unicorn(*args)
-        SSHKit::Command.new(:bundle, :exec, :unicorn, args).to_command
+        SSHKit::Command.new(:bundle, :exec, :unicorn, args)
       end
 
       # renders the ERB template specified by template_name to string. Use the locals variable to pass locals to the

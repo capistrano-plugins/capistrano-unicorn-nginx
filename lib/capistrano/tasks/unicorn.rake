@@ -36,9 +36,15 @@ namespace :unicorn do
   desc 'Setup Unicorn initializer'
   task :setup_initializer do
     on roles :app do
-      sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
-      execute :chmod, '+x', unicorn_initd_file
-      sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      case fetch(:init_system)
+      when :sysv
+        sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
+        execute :chmod, '+x', unicorn_initd_file
+        sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      when :systemd
+        sudo_upload! template('unicorn_service.erb'), unicorn_systemd_file
+        sudo 'systemctl', 'daemon-reload'
+      end
     end
   end
 
@@ -53,9 +59,11 @@ namespace :unicorn do
   desc 'Setup logrotate configuration'
   task :setup_logrotate do
     on roles :app do
-      sudo :mkdir, '-pv', File.dirname(fetch(:unicorn_logrotate_config))
-      sudo_upload! template('unicorn-logrotate.rb.erb'), fetch(:unicorn_logrotate_config)
-      sudo 'chown', 'root:root', fetch(:unicorn_logrotate_config)
+      if fetch(:init_system) == :sysv
+        sudo :mkdir, '-pv', File.dirname(fetch(:unicorn_logrotate_config))
+        sudo_upload! template('unicorn-logrotate.rb.erb'), fetch(:unicorn_logrotate_config)
+        sudo 'chown', 'root:root', fetch(:unicorn_logrotate_config)
+      end
     end
   end
 
@@ -63,7 +71,23 @@ namespace :unicorn do
     desc "#{command} unicorn"
     task command do
       on roles :app do
-        sudo 'service', fetch(:unicorn_service), command
+        case fetch(:init_system)
+        when :sysv
+          sudo 'service', fetch(:unicorn_service), command
+        when :systemd
+          sudo 'systemctl', command, fetch(:unicorn_service)
+        end
+      end
+    end
+  end
+
+  task :run_latest do
+    on roles :app do
+      case fetch(:init_system)
+      when :sysv
+        sudo 'service', fetch(:unicorn_service), "reload"
+      when :systemd
+        sudo 'systemctl', "restart", fetch(:unicorn_service)
       end
     end
   end
@@ -74,7 +98,7 @@ namespace :unicorn do
 end
 
 namespace :deploy do
-  after :publishing, 'unicorn:reload'
+  after :publishing, 'unicorn:run_latest'
 end
 
 desc 'Server setup tasks'
