@@ -50,6 +50,15 @@ Depending on your needs 2 general scenarios are covered:
   (unicorn) on the same node.
 - [multiple server setup](https://github.com/capistrano-plugins/capistrano-unicorn-nginx/wiki/Multiple-server-setup)<br/>
   Webserver (nginx) and application server (unicorn) run on different nodes.
+  
+### Ubuntu 16.04 ###
+In order for current version to work you need upstart installed instead of systemd.
+
+`sudo apt-get install upstart-sysv package` 
+
+This commando should remove `ubuntu-standard` and `systemd-sysv`.
+
+After that go ahead and run `sudo update-initramfs -u`.
 
 ### Default log file directories
 
