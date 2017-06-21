@@ -2,6 +2,12 @@
 
 ### master
 
+
+### v4.1.0, 2017-06-21
+- Auto-generate dhparams.pem if missing
+- Add support for http2
+- Fix unicorn:restart
+
 ### v4.0.0, 2016-03-29
 - Improves SSL security and performance. Breaking changes with 3.4.0. Please
   read README.md

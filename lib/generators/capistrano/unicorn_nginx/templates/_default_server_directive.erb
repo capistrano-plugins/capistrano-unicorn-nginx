@@ -7,7 +7,9 @@ map $ssl_client_raw_cert $a {
 
 server {
 <% if fetch(:nginx_use_ssl) -%>
-    <% if fetch(:nginx_use_spdy) -%>
+    <% if fetch(:nginx_use_http2) -%>
+    listen <%= ssl_port %> http2;
+    <% elsif fetch(:nginx_use_spdy) -%>
     listen <%= ssl_port %> spdy;
     <% else -%>
     listen <%= ssl_port %>;
@@ -24,7 +26,7 @@ server {
 
     ssl_stapling on;
     ssl_stapling_verify on;
-    ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+    ssl_dhparam <%= nginx_dh_params_file %>;
 <% else -%>
     listen <%= fetch(:nginx_server_port) %>;
 <% end -%>

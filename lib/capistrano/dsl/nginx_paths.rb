@@ -6,6 +6,10 @@ module Capistrano
         "#{fetch(:nginx_location)}/sites-available/#{fetch(:nginx_config_name)}"
       end
 
+      def nginx_dh_params_file
+        "/etc/nginx/ssl/dhparam.pem"
+      end
+
       def nginx_sites_enabled_file
         "#{fetch(:nginx_location)}/sites-enabled/#{fetch(:nginx_config_name)}"
       end
