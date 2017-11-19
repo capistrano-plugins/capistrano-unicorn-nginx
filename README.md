@@ -43,6 +43,18 @@ end
 
 # Capistrano::UnicornNginx
 
+> NOTE: The instructions below are no longer necessary from version 4.1.0.
+> The dhparam file will be automatically generated if missing.
+>
+> IMPORTANT NOTE. When upgrading to 4.0.0, please ensure you have
+> generated a new 2048 bits Diffie-Hellman group. Run the following command
+> on your server before installing this gem:
+>
+> `openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048`
+>
+> See <https://weakdh.org/sysadmin.html> for more details.
+>
+
 Capistrano tasks for automatic and sensible unicorn + nginx configuraion.
 
 Goals of this plugin:
@@ -68,8 +80,8 @@ see below for all available tasks
 Add this to `Gemfile`:
 
     group :development do
-      gem 'capistrano', '~> 3.2.1'
-      gem 'capistrano-unicorn-nginx', '~> 3.2.0'
+      gem 'capistrano', '~> 3.6.1'
+      gem 'capistrano-unicorn-nginx', '~> 4.1.0'
     end
 
 And then:
@@ -85,6 +97,15 @@ Depending on your needs 2 general scenarios are covered:
   (unicorn) on the same node.
 - [multiple server setup](https://github.com/capistrano-plugins/capistrano-unicorn-nginx/wiki/Multiple-server-setup)<br/>
   Webserver (nginx) and application server (unicorn) run on different nodes.
+
+### Ubuntu 16.04 ###
+In order for current version to work you need upstart installed instead of systemd.
+
+`sudo apt-get install upstart-sysv package`
+
+This commando should remove `ubuntu-standard` and `systemd-sysv`.
+
+After that go ahead and run `sudo update-initramfs -u`.
 
 ### Default log file directories
 

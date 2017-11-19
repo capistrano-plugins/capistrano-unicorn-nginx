@@ -9,11 +9,13 @@ namespace :load do
     set :templates_path, 'config/deploy/templates'
     set :nginx_config_name, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
     set :nginx_pid, nginx_default_pid_file
+    set :nginx_service_path, '/etc/init.d/nginx'
     # set :nginx_server_name # default set in the `nginx:defaults` task
     # ssl options
     set :nginx_location, '/etc/nginx'
     set :nginx_use_ssl, false
     set :nginx_use_spdy, false
+    set :nginx_use_http2, false
     # if true, passes the SSL client certificate to the application server for consumption in Ruby code
     set :nginx_pass_ssl_client_cert, false
     set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
@@ -48,7 +50,16 @@ namespace :nginx do
     end
   end
 
-  desc 'Setup nginx ssl certs. Force override with FORCE=true'
+  desc 'Setup nginx Diffie-Hellman parameters'
+  task :setup_dh_params do
+    next unless fetch(:nginx_use_ssl)
+    on roles :web do
+      next if file_exists?(nginx_dh_params_file) && file_exists?(nginx_dh_params_file)
+      sudo :mkdir, '-p', File.dirname(nginx_dh_params_file)
+      sudo :openssl, 'dhparam -out', nginx_dh_params_file, '2048'
+    end
+  end
+
   task :setup_ssl do
     next unless fetch(:nginx_use_ssl)
     on roles :web do
@@ -76,6 +87,7 @@ namespace :nginx do
   end
 
   before :setup, :defaults
+  before :setup_dh_params, :defaults
   before :setup_ssl, :defaults
 
   desc 'service startup on restart'
@@ -96,5 +108,6 @@ end
 desc 'Server setup tasks'
 task :setup do
   invoke 'nginx:setup'
+  invoke 'nginx:setup_dh_params'
   invoke 'nginx:setup_ssl'
 end

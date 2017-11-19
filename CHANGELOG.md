@@ -1,5 +1,19 @@
 # Changelog
 
+### v5.0.0, 2017-11-19
+
+Release based on merging from upstream of v4.1.0 and v4.0.0. The changelogs from upstream:
+
+#### Upstream v4.1.0, 2017-06-21
+- Auto-generate dhparams.pem if missing
+- Add support for http2
+- Fix unicorn:restart
+
+#### upstream v4.0.0, 2016-03-29
+- Improves SSL security and performance. Breaking changes with 3.4.0. Please
+  read README.md
+
+
 ### v4.3.0 / 2017-01-14
 - Ability to update SSL certificate if already exists
 
