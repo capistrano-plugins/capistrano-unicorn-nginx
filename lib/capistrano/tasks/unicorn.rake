@@ -26,7 +26,6 @@ namespace :load do
 end
 
 namespace :unicorn do
-
   task :defaults do
     on roles :app do
       set :unicorn_user, fetch(:unicorn_user, deploy_user)
@@ -38,7 +37,9 @@ namespace :unicorn do
     on roles :app do
       sudo_upload! template('unicorn_init.erb'), unicorn_initd_file
       execute :chmod, '+x', unicorn_initd_file
-      sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      # sudo 'update-rc.d', '-f', fetch(:unicorn_service), 'defaults'
+      sudo 'chkconfig', '--add', fetch(:unicorn_service)
+      sudo 'chkconfig', fetch(:unicorn_service), 'on'
     end
   end
 
@@ -61,6 +62,7 @@ namespace :unicorn do
 
   %w[start stop reload upgrade].each do |command|
     desc "#{command} unicorn"
+    desc "run unicorn #{command} command"
     task command do
       on roles :app do
         sudo 'service', fetch(:unicorn_service), command
@@ -82,10 +84,17 @@ namespace :unicorn do
   before :setup_initializer, :defaults
   before :setup_logrotate, :defaults
 
+  # overridable command for restarting the unicorn proces. Typically
+  # you would want to use `unicorn:upgrade` instead (picks up code changes).
+  #
+  # See example for overriding in the README
+  task :restart_command do
+    invoke 'unicorn:restart'
+  end
 end
 
 namespace :deploy do
-  after :publishing, 'unicorn:restart'
+  after :publishing, 'unicorn:restart_command'
 end
 
 desc 'Server setup tasks'

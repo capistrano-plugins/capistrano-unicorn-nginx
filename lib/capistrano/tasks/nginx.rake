@@ -44,8 +44,9 @@ namespace :nginx do
   desc 'Setup nginx configuration'
   task :setup do
     on roles :web do
-      sudo_upload! template('nginx_conf.erb'), nginx_sites_available_file
-      sudo :ln, '-fs', nginx_sites_available_file, nginx_sites_enabled_file
+      # sudo_upload! template('nginx_conf.erb'), nginx_sites_available_file
+      # sudo :ln, '-fs', nginx_sites_available_file, nginx_sites_enabled_file
+      sudo_upload! template('nginx_conf.erb'), centos_nginx_conf_file
     end
   end
 
@@ -59,11 +60,10 @@ namespace :nginx do
     end
   end
 
-  desc 'Setup nginx ssl certs'
   task :setup_ssl do
     next unless fetch(:nginx_use_ssl)
     on roles :web do
-      next if file_exists?(nginx_ssl_cert_file) && file_exists?(nginx_ssl_cert_key_file)
+      next if ENV['force'] != 'true' && file_exists?(nginx_ssl_cert_file) && file_exists?(nginx_ssl_cert_key_file)
       if fetch(:nginx_upload_local_cert)
         sudo_upload! fetch(:nginx_ssl_cert_local_path), nginx_ssl_cert_file
         sudo_upload! fetch(:nginx_ssl_cert_key_local_path), nginx_ssl_cert_key_file
@@ -73,16 +73,32 @@ namespace :nginx do
     end
   end
 
-  desc 'Reload nginx configuration'
-  task :reload do
-    on roles :web do
-      sudo nginx_service_path, 'reload'
+  # will generate all commands that nginx supports, for instance:
+  # cap ENV nginx:start
+  # cap ENV nginx:reload
+  # cap ENV nginx:configtest
+  %w(start stop reload configtest status force-reload upgrade restart reopen_logs).each do |tsk|
+    desc %('#{tsk.capitalize}' nginx command)
+    task tsk do
+      on roles :web do
+        sudo nginx_service_path, tsk
+      end
     end
   end
 
   before :setup, :defaults
   before :setup_dh_params, :defaults
   before :setup_ssl, :defaults
+
+  desc 'service startup on restart'
+  task 'service_startup' do
+    on roles :web do
+      # should be done already:
+      sudo 'chkconfig', '--add', nginx_service_name
+      sudo 'chkconfig', nginx_service_name, 'on'
+    end
+  end
+  after :setup, :service_startup
 end
 
 namespace :deploy do

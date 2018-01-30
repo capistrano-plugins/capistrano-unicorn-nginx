@@ -1,13 +1,56 @@
+# This Fork
+
+This fork provides specific adjustments to work with Amazon Linux (which in turn is Redhat-based).
+
+This means that some commands are different:
+
+* using `chkconfig` instead of update-rc.d
+* assuming `nginx` is installed and available at `/etc/nginx`
+* assuming configuration for nginx lives at `/etc/conf.d/[ENV_NAME].conf`
+
+All credit to irlrobot.
+
+# NOTE: This fork has different version numbers!
+
+Since I made this fork, in order to use the release pages on github, I decided
+to move forward and put new version numbers.
+
+So beware that version numbers differ from v4.0.0 and onwards.
+
+# unicorn:restart vs unicorn:upgrade
+
+For backwards compatibility, this plugin will run `sudo service unicorn restart`,
+which reloads processes but doesn't pick up code changes.
+
+Typically you would want to use `unicorn:upgrade` instead (picks up code changes).
+
+put the following snippet in your `deploy.rb`:
+
+```
+# clear originating task before replacing it
+Rake::Task['unicorn:restart_command'].clear_actions
+namespace :unicorn do
+  task :restart_command do
+    invoke 'unicorn:upgrade'
+  end
+end
+```
+
+
+
+-----
+
+
 # Capistrano::UnicornNginx
 
-> NOTE: The instructions below are no longer necessary from version 4.1.0. 
+> NOTE: The instructions below are no longer necessary from version 4.1.0.
 > The dhparam file will be automatically generated if missing.
 >
 > IMPORTANT NOTE. When upgrading to 4.0.0, please ensure you have
-> generated a new 2048 bits Diffie-Hellman group. Run the following command 
+> generated a new 2048 bits Diffie-Hellman group. Run the following command
 > on your server before installing this gem:
 >
-> `openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048` 
+> `openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048`
 >
 > See <https://weakdh.org/sysadmin.html> for more details.
 >
@@ -54,11 +97,11 @@ Depending on your needs 2 general scenarios are covered:
   (unicorn) on the same node.
 - [multiple server setup](https://github.com/capistrano-plugins/capistrano-unicorn-nginx/wiki/Multiple-server-setup)<br/>
   Webserver (nginx) and application server (unicorn) run on different nodes.
-  
+
 ### Ubuntu 16.04 ###
 In order for current version to work you need upstart installed instead of systemd.
 
-`sudo apt-get install upstart-sysv package` 
+`sudo apt-get install upstart-sysv package`
 
 This commando should remove `ubuntu-standard` and `systemd-sysv`.
 

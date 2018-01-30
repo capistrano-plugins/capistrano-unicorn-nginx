@@ -1,16 +1,36 @@
 # Changelog
 
-### master
+### v5.0.0, 2017-11-19
 
+Release based on merging from upstream of v4.1.0 and v4.0.0. The changelogs from upstream:
 
-### v4.1.0, 2017-06-21
+#### Upstream v4.1.0, 2017-06-21
 - Auto-generate dhparams.pem if missing
 - Add support for http2
 - Fix unicorn:restart
 
-### v4.0.0, 2016-03-29
+#### upstream v4.0.0, 2016-03-29
 - Improves SSL security and performance. Breaking changes with 3.4.0. Please
   read README.md
+
+
+### v4.3.0 / 2017-01-14
+- Ability to update SSL certificate if already exists
+
+### v4.2.0, 2015-06-07
+- Fix possibility to use unicorn:upgrade as restarting command
+- Added usage notes in README
+
+### v4.1.1, 2015-04-08
+- Fix task "cap nginx:service_startup"
+
+### v4.1.0, 2015-04-08
+- nginx:service_on for runlevel
+
+### v4.0.0, 2016-01-30
+- First release on jesperronn fork with independent version numbers
+  (differs from upstream source)
+- More nginx commands, for example 'nginx:start'
 
 ### v3.4.0, 2015-09-17
 - Allow customizing paths for SSL certificate and key
