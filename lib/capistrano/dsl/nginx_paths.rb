@@ -1,13 +1,12 @@
 module Capistrano
   module DSL
     module NginxPaths
-
       def nginx_sites_available_file
         "#{fetch(:nginx_location)}/sites-available/#{fetch(:nginx_config_name)}"
       end
 
       def nginx_dh_params_file
-        "/etc/nginx/ssl/dhparam.pem"
+        '/etc/nginx/ssl/dhparam.pem'
       end
 
       def nginx_sites_enabled_file
@@ -15,7 +14,7 @@ module Capistrano
       end
 
       def nginx_service_path
-        "#{fetch(:nginx_service_path)}"
+        fetch(:nginx_service_path).to_s
       end
 
       def nginx_default_pid_file
@@ -32,11 +31,11 @@ module Capistrano
       end
 
       def nginx_default_ssl_cert_file_path
-        "/etc/ssl/certs/"
+        '/etc/ssl/certs/'
       end
 
       def nginx_default_ssl_cert_key_file_path
-        "/etc/ssl/private/"
+        '/etc/ssl/private/'
       end
 
       def nginx_ssl_cert_file
@@ -47,6 +46,10 @@ module Capistrano
         "#{fetch(:nginx_ssl_cert_key_path)}#{fetch(:nginx_ssl_cert_key)}"
       end
 
+      def nginx_ssl_client_ca
+        fetch(:nginx_ssl_client_ca)
+      end
+
       # log files
       def nginx_access_log_file
         "/var/log/nginx/#{fetch(:nginx_config_name)}.access.log"
@@ -55,7 +58,6 @@ module Capistrano
       def nginx_error_log_file
         "/var/log/nginx/#{fetch(:nginx_config_name)}.error.log"
       end
-
     end
   end
 end

@@ -2,6 +2,9 @@
 
 ### master
 
+### v4.2.0, 2018-02-08
+- Add support for client authentication using a root CA. Inspired by
+  http://www.pandurang-waghulde.com/2014/06/client-side-ssl-certificate.html
 
 ### v4.1.0, 2017-06-21
 - Auto-generate dhparams.pem if missing
