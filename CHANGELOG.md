@@ -2,6 +2,11 @@
 
 ### master
 
+### v5.0.0, 2018-02-08
+- Remove `nginx_pass_ssl_client_cert` in favor of nginx_use_client_ssl
+- Add `nginx_server_ssl_ports` to specify which ports nginx should listen on
+- Remove `nginx_use_spdy`. Use `nginx_use_http2` instead.
+
 ### v4.2.0, 2018-02-08
 - Add support for client authentication using a root CA. Inspired by
   http://www.pandurang-waghulde.com/2014/06/client-side-ssl-certificate.html

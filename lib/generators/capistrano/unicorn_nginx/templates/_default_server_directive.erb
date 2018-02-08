@@ -1,24 +1,14 @@
-<% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert -%>
-# source: http://forum.nginx.org/read.php?2,236546,236596
-map $ssl_client_raw_cert $a {
-    "~^(-.*-\n)(?<1st>[^\n]+)\n((?<b>[^\n]+)\n)?((?<c>[^\n]+)\n)?((?<d>[^\n]+)\n)?((?<e>[^\n]+)\n)?((?<f>[^\n]+)\n)?((?<g>[^\n]+)\n)?((?<h>[^\n]+)\n)?((?<i>[^\n]+)\n)?((?<j>[^\n]+)\n)?((?<k>[^\n]+)\n)?((?<l>[^\n]+)\n)?((?<m>[^\n]+)\n)?((?<n>[^\n]+)\n)?((?<o>[^\n]+)\n)?((?<p>[^\n]+)\n)?((?<q>[^\n]+)\n)?((?<r>[^\n]+)\n)?((?<s>[^\n]+)\n)?((?<t>[^\n]+)\n)?((?<v>[^\n]+)\n)?((?<u>[^\n]+)\n)?((?<w>[^\n]+)\n)?((?<x>[^\n]+)\n)?((?<y>[^\n]+)\n)?((?<z>[^\n]+)\n)?(-.*-)$" $1st;
-}
-<% end -%>
-
 server {
 <% if fetch(:nginx_use_ssl) -%>
-    <% if fetch(:nginx_use_http2) -%>
-    listen <%= ssl_port %> http2;
-    <% elsif fetch(:nginx_use_spdy) -%>
-    listen <%= ssl_port %> spdy;
-    <% else -%>
-    listen <%= ssl_port %>;
+    <% fetch(:nginx_server_ssl_ports).each do |port| -%>
+      listen <%= port %> <%= 'http2' if fetch(:nginx_use_http2)-%>;
     <% end -%>
     ssl on;
     ssl_certificate <%= nginx_ssl_cert_file %>;
     ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
     <% if fetch(:nginx_use_client_ssl) -%>
     ssl_trusted_certificate <%= nginx_ssl_client_ca %>;
+    ssl_verify_client optional_no_ca;
     <% end -%>
 
     ssl_session_cache shared:SSL:10m;
@@ -37,10 +27,6 @@ server {
   server_tokens off;
 
   add_header X-Content-Type-Options nosniff;
-
-<% if fetch(:nginx_use_ssl) && (nginx_pass_ssl_client_cert || fetch(:nginx_use_client_ssl)) -%>
-    ssl_verify_client optional_no_ca;
-<% end -%>
 
     client_max_body_size 4G;
     keepalive_timeout 10;
@@ -66,11 +52,7 @@ server {
         proxy_set_header X-Client-Dn $ssl_client_s_dn;
         proxy_set_header X-Client-Serial $ssl_client_serial;
         proxy_set_header X-Client-Verify $ssl_client_verify;
-        <% end -%>
-
-        <% if fetch(:nginx_use_ssl) && nginx_pass_ssl_client_cert -%>
-        # source: http://forum.nginx.org/read.php?2,236546,236596
-        proxy_set_header X-Client-Cert $a$b$c$d$e$f$g$h$i$j$k$l$m$n$o$p$q$r$s$t$v$u$w$x$y$z;
+        proxy_set_header X-Client-Raw-Cert $ssl_client_raw_cert;
         <% end -%>
 
         proxy_pass http://unicorn_<%= fetch(:nginx_config_name) %>;

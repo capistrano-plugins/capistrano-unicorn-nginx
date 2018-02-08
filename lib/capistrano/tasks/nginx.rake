@@ -14,10 +14,19 @@ namespace :load do
     # ssl options
     set :nginx_location, '/etc/nginx'
     set :nginx_use_ssl, false
-    set :nginx_use_spdy, false
     set :nginx_use_http2, false
-    # if true, passes the SSL client certificate to the application server for consumption in Ruby code
-    set :nginx_pass_ssl_client_cert, false
+    # if true, verifies the client certificate, and passes a number of variables
+    # in the header to the application server consumption in Ruby code. These
+    # are:
+    # - X-Client-DN: the Distinguished Name of the certificate
+    # - X-Client-Serial: the Serial Number of the certificate
+    # - X-Client-Verify:
+    #   - SUCCESS if a certificate was supplied that was signed by the CA.
+    #   - FAILED if a certificate was supplied that was not signed by the CA.
+    #   - NONE if no certificate was supplied
+    # - X-Client-Raw-Cert: the raw (PEM) version of the supplied certificate
+    set :nginx_use_client_ssl, false
+    set :nginx_ssl_client_ca, '' # the location of the root CA (on server)
     set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
     set :nginx_ssl_cert_key, -> { nginx_default_ssl_cert_key_file_name }
     set :nginx_ssl_cert_path, -> { nginx_default_ssl_cert_file_path }
@@ -33,11 +42,11 @@ namespace :load do
 end
 
 namespace :nginx do
-
   task :defaults do
     on roles :web do
       set :nginx_server_name, fetch(:nginx_server_name, host.to_s)
       set :nginx_server_port, fetch(:nginx_server_port, 80)
+      set :nginx_server_ssl_ports, fetch(:nginx_server_ssl_ports, [443])
     end
   end
 

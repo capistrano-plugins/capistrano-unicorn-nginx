@@ -16,10 +16,4 @@ server {
 }
 <% end -%>
 
-<%# render the default server directive. If SSL is enabled, port 443 is used %>
-<%= template_to_s("_default_server_directive.erb", ssl_port: 443, nginx_pass_ssl_client_cert: false).to_s %>
-
-<% if fetch(:nginx_pass_ssl_client_cert) -%>
-<%# render the server directive with SSL client certificate authentication enabled on port 444 %>
-<%= template_to_s("_default_server_directive.erb", ssl_port: 444, nginx_pass_ssl_client_cert: true).to_s %>
-<% end -%>
+<%= template_to_s("_default_server_directive.erb").to_s %>
