@@ -2,6 +2,10 @@
 
 ### master
 
+### v5.1.0, 2018-02-08
+- Remove raw certificate from nginx header. This can result in 400 errors in
+  conjunction with unicorn (some versions). Use ssl_client_cert instead
+
 ### v5.0.0, 2018-02-08
 - Remove `nginx_pass_ssl_client_cert` in favor of nginx_use_client_ssl
 - Add `nginx_server_ssl_ports` to specify which ports nginx should listen on
