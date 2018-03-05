@@ -7,7 +7,9 @@ server {
     ssl_certificate <%= nginx_ssl_cert_file %>;
     ssl_certificate_key <%= nginx_ssl_cert_key_file %>;
     <% if fetch(:nginx_use_client_ssl) -%>
+    <% if fetch(:nginx_ssl_client_ca) -%>
     ssl_trusted_certificate <%= nginx_ssl_client_ca %>;
+    <% end -%>
     ssl_verify_client optional_no_ca;
     <% end -%>
 

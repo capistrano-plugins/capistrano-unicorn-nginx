@@ -2,6 +2,10 @@
 
 ### master
 
+### v5.2.0, 2018-03-05
+- Allow nginx_ssl_client_ca to be empty, otherwise the setting `optional_no_ca`
+  does not seem to work correctly
+
 ### v5.1.0, 2018-02-08
 - Remove raw certificate from nginx header. This can result in 400 errors in
   conjunction with unicorn (some versions). Use ssl_client_cert instead

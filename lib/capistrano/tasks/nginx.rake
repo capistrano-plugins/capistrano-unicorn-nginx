@@ -26,7 +26,7 @@ namespace :load do
     #   - NONE if no certificate was supplied
     # - X-Client-Cert: the PEM version of the supplied certificate
     set :nginx_use_client_ssl, false
-    set :nginx_ssl_client_ca, '' # the location of the root CA (on server)
+    set :nginx_ssl_client_ca, nil # the location of the root CA (on server)
     set :nginx_ssl_cert, -> { nginx_default_ssl_cert_file_name }
     set :nginx_ssl_cert_key, -> { nginx_default_ssl_cert_key_file_name }
     set :nginx_ssl_cert_path, -> { nginx_default_ssl_cert_file_path }
