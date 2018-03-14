@@ -36,6 +36,9 @@ namespace :load do
     set :nginx_ssl_cert_key_local_path, -> { ask(:nginx_ssl_cert_key_local_path, 'Local path to ssl certificate key: ') }
     set :nginx_fail_timeout, 0 # see http://nginx.org/en/docs/http/ngx_http_upstream_module.html#fail_timeout
     set :nginx_read_timeout, nil
+    
+    set :nginx_log_path, nil
+    set :nginx_log_level, 'debug'
 
     set :linked_dirs, fetch(:linked_dirs, []).push('log')
   end
